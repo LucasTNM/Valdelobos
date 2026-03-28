@@ -58,7 +58,7 @@ export default class MenuScene extends Phaser.Scene {
             fontFamily: 'Arial, sans-serif',
             fontSize: titleSize + 'px',
             fontStyle: 'bold',
-            color: '#1a1a1a',
+            color: '#FFFFFF',
             shadow: {
                 offsetX: 3,
                 offsetY: 3,

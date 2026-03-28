@@ -13,5 +13,18 @@
   },
   "dependencies": {
     "phaser": "^3.90.0"
-  }
+  },
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LucasTNM/Valdelobos.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LucasTNM/Valdelobos/issues"
+  },
+  "homepage": "https://github.com/LucasTNM/Valdelobos#readme"
 }
