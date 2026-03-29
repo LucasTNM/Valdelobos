@@ -56,6 +56,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             right: Phaser.Input.Keyboard.KeyCodes.D,
             toggleLight: Phaser.Input.Keyboard.KeyCodes.F
         });
+
+        // Flag para controlar animação
+        this.isAnimationPlaying = false;
     }
 
     update() {
@@ -63,13 +66,19 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (Phaser.Input.Keyboard.JustDown(this.wasd.toggleLight)) {
             this.toggleLight();
         }
+        
+        // Verificar se há movimento
+        let isMoving = false;
+        
         // Movimentação horizontal
         if (this.cursors.left.isDown || this.wasd.left.isDown) {
             this.setVelocityX(-this.speed);
             this.setFlipX(true);
+            isMoving = true;
         } else if (this.cursors.right.isDown || this.wasd.right.isDown) {
             this.setVelocityX(this.speed);
             this.setFlipX(false);
+            isMoving = true;
         } else {
             this.setVelocityX(0);
         }
@@ -77,10 +86,27 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Movimentação vertical (opcional para exploração)
         if (this.cursors.up.isDown || this.wasd.up.isDown) {
             this.setVelocityY(-this.speed);
+            isMoving = true;
         } else if (this.cursors.down.isDown || this.wasd.down.isDown) {
             this.setVelocityY(this.speed);
+            isMoving = true;
         } else {
             this.setVelocityY(0);
+        }
+
+        // Controlar animação com base no movimento
+        if (isMoving) {
+            if (!this.isAnimationPlaying) {
+                this.setTexture('vaguetti_frame_0'); // Trocar para primeira frame da animação
+                this.play('vaguetti_walk');
+                this.isAnimationPlaying = true;
+            }
+        } else {
+            if (this.isAnimationPlaying) {
+                this.stop();
+                this.setTexture('vaguetti'); // Voltar à imagem default
+                this.isAnimationPlaying = false;
+            }
         }
 
         // Lógica de Ataque (Espaço) - Somente se a luz estiver ligada e houver combustível

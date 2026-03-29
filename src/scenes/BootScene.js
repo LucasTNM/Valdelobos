@@ -8,7 +8,16 @@ export default class BootScene extends Phaser.Scene {
     preload() {
         // Carregar a imagem do personagem
         this.load.image('tela_inicial', './assets/tela_inicial.png');
-        this.load.image('hero', './assets/hero.png');
+        
+        // Carregar frames de animação do Vaguetti
+        this.load.image('vaguetti_frame_0', '/assets/vaguettepng/sprite_vaguette_00000-removebg-preview.png');
+        this.load.image('vaguetti_frame_1', '/assets/vaguettepng/sprite_vaguette_00005-removebg-preview.png');
+        this.load.image('vaguetti_frame_2', '/assets/vaguettepng/sprite_vaguette_00010-removebg-preview.png');
+        this.load.image('vaguetti_frame_3', '/assets/vaguettepng/sprite_vaguette_00015-removebg-preview.png');
+        this.load.image('vaguetti_frame_4', '/assets/vaguettepng/sprite_vaguette_00020-removebg-preview.png');
+        this.load.image('vaguetti_frame_5', '/assets/vaguettepng/sprite_vaguette_00025-removebg-preview.png');
+        
+        // Imagem estática para fallback
         this.load.image('vaguetti', './assets/Vaguetti.png');
 
         // Monstros principais:
@@ -129,6 +138,23 @@ export default class BootScene extends Phaser.Scene {
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, size, size);
         canvas.refresh();
+
+        // Criar spritesheet do Vaguetti combinando os frames de animação
+        if (!this.anims.exists('vaguetti_walk')) {
+            this.anims.create({
+                key: 'vaguetti_walk',
+                frames: [
+                    { key: 'vaguetti_frame_0', frame: 0 },
+                    { key: 'vaguetti_frame_1', frame: 0 },
+                    { key: 'vaguetti_frame_2', frame: 0 },
+                    { key: 'vaguetti_frame_3', frame: 0 },
+                    { key: 'vaguetti_frame_4', frame: 0 },
+                    { key: 'vaguetti_frame_5', frame: 0 }
+                ],
+                frameRate: 10,
+                repeat: -1
+            });
+        }
 
         // Criar animações globais para inimigos
         if (!this.anims.exists('enemy_light_walk')) {

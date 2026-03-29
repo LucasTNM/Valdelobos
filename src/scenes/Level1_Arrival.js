@@ -10,7 +10,8 @@ export default class Level1_Arrival extends Phaser.Scene {
    preload() {
     this.load.image('vaguetti', '/assets/Vaguetti.png');
     this.load.image('forest_trees', '/assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
-    this.load.image('bg_dark_forest', '/assets/ForestVegetation/darkforest.png'); // 👈 AQUI
+    this.load.image('clean_florest', '/assets/clean_florest.png');
+    this.load.image('moto_foda', '/assets/moto_foda.png');
 }
 
     create() {
@@ -23,39 +24,12 @@ export default class Level1_Arrival extends Phaser.Scene {
         this.input.keyboard.off('keydown-SPACE');
         this.input.keyboard.off('keydown-ESC');
 
-        // Fundo - céu/floresta ao fundo - RESPONSIVO
-        const graphics = this.add.graphics();
+        // Fundo - Dark Forest - RESPONSIVO
         const w = worldWidth;
         const h = worldHeight;
         
-        // Céu noturno degradado (estendido)
-        graphics.fillStyle(0x0a0a1a, 1);
-        graphics.fillRect(0, 0, w, h * 0.5);
-        
-        graphics.fillStyle(0x1a0a0a, 1);
-        graphics.fillRect(0, h * 0.5, w, h * 0.5);
-
-        // Grama/fundo verde escuro (estendido)
-        graphics.fillStyle(0x0d3d0d, 1);
-        graphics.fillRect(0, h * 0.58, w, h * 0.42);
-
-        // Fundo do level (dark forest) - fica atrás dos efeitos da cena
-        this.add.image(0, 0, 'bg_dark_forest').setOrigin(0, 0).setDisplaySize(w, h).setDepth(-1);
-
-        // Camada de árvores ao fundo (usando sprite)
-        this.createBackgroundForest(w, h);
-
-        // Estrada principal
-        this.createRoad(graphics, w, h);
-
-        // Árvores nas laterais com sprites
-        this.createSideTreesWithSprites(w, h);
-
-        // Moto na estrada (estacionada perto da chegada)
-        const moto = this.add.image(this.scale.width * 0.75, h * 0.7, 'moto_foda');
-        moto.setOrigin(0.5, 1);
-        moto.setScale(0.8);
-        moto.setDepth(3);
+        // Fundo do level (clean florest) como background principal
+        this.add.image(0, 0, 'clean_florest').setOrigin(0, 0).setDisplaySize(w, h).setDepth(-1);
 
         // Camada de escuridão (Night Overlay)
         this.nightOverlay = this.add.graphics();

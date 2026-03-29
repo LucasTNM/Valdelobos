@@ -10,6 +10,8 @@ export default class Level4_Camp extends Phaser.Scene {
     preload() {
         this.load.image('vaguetti', '/assets/Vaguetti.png');
         this.load.image('forest_trees', '/assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
+        this.load.image('bg_dark_forest', '/assets/ForestVegetation/dark_forest.png');
+        this.load.image('querosene', '/assets/querosene.png');
     }
 
     create() {
@@ -152,12 +154,9 @@ export default class Level4_Camp extends Phaser.Scene {
         const fuelPositions = [600, 1000, 1500];
         
         fuelPositions.forEach(x => {
-            // Desenho do galão de combustível mais detalhado
-            const fuelG = this.add.graphics();
-            fuelG.fillStyle(0x00ffff, 0.9);
-            fuelG.fillRoundedRect(-12, -15, 24, 30, 4);
-            fuelG.fillStyle(0x333333, 1);
-            fuelG.fillRect(-6, -20, 12, 5); // Tampa
+            // Imagem do querosene
+            const fuelImg = this.add.image(0, 0, 'querosene');
+            fuelImg.setScale(0.5);
             
             // Brilho externo (aura)
             const aura = this.add.image(0, 0, 'light_mask');
@@ -165,7 +164,7 @@ export default class Level4_Camp extends Phaser.Scene {
             aura.setTint(0x00ffff);
             aura.setAlpha(0.3);
             
-            const container = this.add.container(x, h * 0.7, [aura, fuelG]);
+            const container = this.add.container(x, h * 0.7, [aura, fuelImg]);
             this.physics.add.existing(container);
             this.fuelGroup.add(container);
             

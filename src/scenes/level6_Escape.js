@@ -9,7 +9,8 @@ export default class level6_Escape extends Phaser.Scene {
 
     preload() {
         this.load.image('vaguetti', '/assets/Vaguetti.png');
-        this.load.image('forest_trees', '/assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
+        this.load.image('forest', '/assets/ForestVegetation/Floresta.png');
+        this.load.image('moto', '/assets/moto_foda.png');
     }
 
     create() {
@@ -17,7 +18,7 @@ export default class level6_Escape extends Phaser.Scene {
         const h = this.scale.height;
 
         // Fundo do level (dark forest)
-        this.add.image(0, 0, 'bg_dark_forest').setOrigin(0, 0).setDisplaySize(w, h).setDepth(-1);
+        this.add.image(0, 0, 'forest').setOrigin(0, 0).setDisplaySize(w, h).setDepth(-1);
 
         const graphics = this.add.graphics();
 
@@ -31,16 +32,16 @@ export default class level6_Escape extends Phaser.Scene {
 
         // Árvores fantasmagóricas
         for (let i = 0; i < 10; i++) {
-            const tree = this.add.sprite(Math.random() * w, h * 0.45, 'forest_trees');
+            const tree = this.add.sprite(Math.random() * w, h * 0.45, 'forest');
             tree.setScale(0.6);
             tree.setTint(0x0a0a0a);
         }
 
         // A Moto (Objetivo Final)
         this.motoContainer = this.add.container(w * 0.85, h * 0.7);
-        const motoG = this.add.graphics();
-        this.drawMotorcycle(motoG, 0, 0);
-        this.motoContainer.add(motoG);
+        const motoImg = this.add.image(0, 0, 'moto');
+        motoImg.setScale(0.8);
+        this.motoContainer.add(motoImg);
         this.physics.add.existing(this.motoContainer, true);
 
         // Player
@@ -52,9 +53,9 @@ export default class level6_Escape extends Phaser.Scene {
         this.player.beam.setDepth(102);
         this.player.fuelBar.setDepth(103);
 
-        // Night Overlay
+        // Night Overlay (reduzido para permitir ver o fundo)
         this.nightOverlay = this.add.graphics();
-        this.nightOverlay.fillStyle(0x000000, 1);
+        this.nightOverlay.fillStyle(0x000000, 0.3);
         this.nightOverlay.fillRect(0, 0, w, h);
         this.nightOverlay.setScrollFactor(0);
         this.nightOverlay.setDepth(100);
@@ -148,8 +149,6 @@ export default class level6_Escape extends Phaser.Scene {
         this.player.setVisible(false);
         this.player.light.setVisible(false);
         this.player.fuelBar.setVisible(false);
-        this.headlight.setVisible(true);
-        this.lightCone.setVisible(true);
         
         // Destruir inimigos restantes
         this.enemies.clear(true, true);

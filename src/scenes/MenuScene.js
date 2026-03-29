@@ -95,7 +95,7 @@ export default class MenuScene extends Phaser.Scene {
 
     createMainMenu() {
         const menuItems = [
-            { text: 'INICIAR JOGO', scene: 'Level1_Arrival' },
+            { text: 'INICIAR JOGO', scene: 'Fishing' },
             { text: 'SAIR', scene: null }
         ];
 
