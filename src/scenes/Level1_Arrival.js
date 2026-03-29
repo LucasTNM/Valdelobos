@@ -7,11 +7,11 @@ export default class Level1_Arrival extends Phaser.Scene {
         super('Level1_Arrival');
     }
 
-    preload() {
-        // O Vite serve a pasta "public" na raiz. Comece direto pelo nome da pasta.
-        this.load.image('vaguetti', '/assets/Vaguetti.png');
-        this.load.image('forest_trees', '/assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
-    }
+   preload() {
+    this.load.image('vaguetti', '/assets/Vaguetti.png');
+    this.load.image('forest_trees', '/assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
+    this.load.image('bg_dark_forest', '/assets/ForestVegetation/darkforest.png'); // 👈 AQUI
+}
 
     create() {
         // Redefinir limites do mundo para permitir exploração horizontal
@@ -39,6 +39,9 @@ export default class Level1_Arrival extends Phaser.Scene {
         graphics.fillStyle(0x0d3d0d, 1);
         graphics.fillRect(0, h * 0.58, w, h * 0.42);
 
+        // Fundo do level (dark forest) - fica atrás dos efeitos da cena
+        this.add.image(0, 0, 'bg_dark_forest').setOrigin(0, 0).setDisplaySize(w, h).setDepth(-1);
+
         // Camada de árvores ao fundo (usando sprite)
         this.createBackgroundForest(w, h);
 
@@ -49,7 +52,10 @@ export default class Level1_Arrival extends Phaser.Scene {
         this.createSideTreesWithSprites(w, h);
 
         // Moto na estrada (estacionada perto da chegada)
-        this.createMotorcycle(graphics, this.scale.width * 0.75, h * 0.7);
+        const moto = this.add.image(this.scale.width * 0.75, h * 0.7, 'moto_foda');
+        moto.setOrigin(0.5, 1);
+        moto.setScale(0.8);
+        moto.setDepth(3);
 
         // Camada de escuridão (Night Overlay)
         this.nightOverlay = this.add.graphics();

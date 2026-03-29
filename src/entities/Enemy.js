@@ -11,18 +11,46 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.speed = type === 'light' ? 80 : 120;
         this.maxHealth = 60;
         this.health = 60;
-        
+
+        // Ajustar escala baseando no tamanho do jogador para ficar equivalente
+        if (scene.player && scene.player.height > 0 && this.height > 0) {
+            const heroDisplayHeight = scene.player.height * scene.player.scaleY;
+            const targetHeight = heroDisplayHeight * 0.9; // um pouco menor que o herói
+            const scale = targetHeight / this.height;
+            this.setScale(scale);
+        } else {
+            this.setScale(1.5);
+        }
+
+        this.setOrigin(0.5, 1); // igual ao jogador para alinhamento de chão
+
+        // Collision body se base no tamanho real (para sprite redimensionada)
+        if (this.body && this.body.setSize) {
+            const bodyWidth = this.displayWidth * 0.8;
+            const bodyHeight = this.displayHeight * 0.85;
+            this.body.setSize(bodyWidth, bodyHeight);
+            this.body.setOffset((this.displayWidth - bodyWidth) / 2, this.displayHeight - bodyHeight);
+        }
+
         // Barra de vida do inimigo
         this.healthBar = scene.add.graphics();
         this.updateHealthBar();
-        
+
         // Estados: IDLE, CHASE, ATTACK
         this.state = 'IDLE';
         this.target = scene.player;
 
-        // Feedback visual
-        this.tintValue = type === 'light' ? 0xffaaaa : 0x5555ff;
-        this.setTint(this.tintValue);
+        if (this.type === 'light') {
+            this.play('enemy_light_walk');
+        } else {
+            // Dependendo do gif, o Phaser pode não animar automaticamente; mantenha o frame
+            this.play('enemy_shadow_idle');
+        }
+
+        // Não tint para sprites detalhadas. Mantém original dos PNGs.
+        // Se quiser depuração de tipo, ative o tint abaixo:
+        // this.tintValue = type === 'light' ? 0xffaaaa : 0x5555ff;
+        // this.setTint(this.tintValue);
     }
 
     update() {

@@ -10,6 +10,27 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('tela_inicial', './assets/tela_inicial.png');
         this.load.image('hero', './assets/hero.png');
         this.load.image('vaguetti', './assets/Vaguetti.png');
+
+        // Monstros principais:
+        // skeleton-walk é sprite sheet 192x48 (4 frames 48x48)
+        this.load.spritesheet('enemy_light_tex', '/assets/skeleton-walk.png', {
+            frameWidth: 48,
+            frameHeight: 48
+        });
+
+        // sprite_transparente.gif é gif animado (armazenado como imagem estática em alguns casos)
+        this.load.image('enemy_shadow_tex', '/assets/sprite_transparente.gif');
+
+        // Assets gerais de fase
+        this.load.image('bg_dark_forest', '/assets/forest/vegetation/dark%20forest.png');
+        this.load.image('moto_foda', '/assets/moto%20foda.png');
+
+
+        this.load.on('loaderror', (file) => {
+            if (file.key === 'enemy_light_tex' || file.key === 'enemy_shadow_tex') {
+                console.warn('Falha no carregamento de', file.key, '-> fallback placeholder será usado.');
+            }
+        });
     }
 
     create() {
@@ -109,28 +130,25 @@ export default class BootScene extends Phaser.Scene {
         ctx.fillRect(0, 0, size, size);
         canvas.refresh();
 
-        // Textura do Inimigo de Luz (Branco/Pálido com aura)
-        const enemySize = 64;
-        const eLightCanvas = this.textures.createCanvas('enemy_light_tex', enemySize, enemySize);
-        const elCtx = eLightCanvas.getContext();
-        elCtx.fillStyle = '#ffffff';
-        elCtx.beginPath();
-        elCtx.moveTo(32, 10); elCtx.lineTo(50, 54); elCtx.lineTo(14, 54); elCtx.closePath();
-        elCtx.fill();
-        elCtx.fillStyle = '#ff0000'; elCtx.fillRect(25, 25, 4, 4); elCtx.fillRect(35, 25, 4, 4);
-        eLightCanvas.refresh();
+        // Criar animações globais para inimigos
+        if (!this.anims.exists('enemy_light_walk')) {
+            this.anims.create({
+                key: 'enemy_light_walk',
+                frames: this.anims.generateFrameNumbers('enemy_light_tex', { start: 0, end: 3 }),
+                frameRate: 8,
+                repeat: -1
+            });
+        }
 
-        // Textura do Inimigo de Sombra (Escuro/Espectral)
-        const eShadowCanvas = this.textures.createCanvas('enemy_shadow_tex', enemySize, enemySize);
-        const esCtx = eShadowCanvas.getContext();
-        esCtx.fillStyle = '#111111';
-        esCtx.beginPath();
-        esCtx.arc(32, 32, 20, 0, Math.PI * 2);
-        esCtx.fill();
-        esCtx.fillStyle = '#ff00ff'; 
-        esCtx.fillRect(25, 30, 3, 3); 
-        esCtx.fillRect(39, 30, 3, 3);
-        eShadowCanvas.refresh();
+        if (!this.anims.exists('enemy_shadow_idle')) {
+            // Caso o GIF de sombra não seja animado em Phaser, mantém um frame estático.
+            this.anims.create({
+                key: 'enemy_shadow_idle',
+                frames: [{ key: 'enemy_shadow_tex', frame: null }],
+                frameRate: 1,
+                repeat: -1
+            });
+        }
 
         // Textura do feixe de luz (Ataque)
         const beamW = 400;

@@ -17,12 +17,16 @@ export default class Level4_Camp extends Phaser.Scene {
         const worldHeight = this.scale.height;
         this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
 
-        const graphics = this.add.graphics();
         const w = worldWidth;
         const h = worldHeight;
 
-        // Fundo escuro (Acampamento à noite)
-        graphics.fillStyle(0x050505, 1);
+        // Fundo do level (dark forest)
+        this.add.image(0, 0, 'bg_dark_forest').setOrigin(0, 0).setDisplaySize(w, h).setDepth(-1);
+
+        const graphics = this.add.graphics();
+
+        // Fundo escuro (Acampamento à noite) com alpha para mostrar a floresta
+        graphics.fillStyle(0x050505, 0.55);
         graphics.fillRect(0, 0, w, h);
 
         // Chão de terra

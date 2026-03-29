@@ -16,10 +16,13 @@ export default class level6_Escape extends Phaser.Scene {
         const w = this.scale.width;
         const h = this.scale.height;
 
+        // Fundo do level (dark forest)
+        this.add.image(0, 0, 'bg_dark_forest').setOrigin(0, 0).setDisplaySize(w, h).setDepth(-1);
+
         const graphics = this.add.graphics();
 
-        // Fundo (Escuridão total)
-        graphics.fillStyle(0x000000, 1);
+        // Fundo de escuridão semi-transparente para manter imagem de fundo visível
+        graphics.fillStyle(0x000000, 0.65);
         graphics.fillRect(0, 0, w, h);
 
         // Estrada de terra (Reta final)
