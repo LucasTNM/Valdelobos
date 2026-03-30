@@ -8,10 +8,10 @@ export default class Level4_Camp extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('vaguetti', '/assets/Vaguetti.png');
-        this.load.image('forest_trees', '/assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
-        this.load.image('bg_dark_forest', '/assets/ForestVegetation/dark_forest.png');
-        this.load.image('querosene', '/assets/querosene.png');
+        this.load.image('vaguetti', './assets/Vaguetti.png');
+        this.load.image('forest_trees', './assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
+        this.load.image('bg_dark_forest', './assets/ForestVegetation/dark_forest.png');
+        this.load.image('querosene', './assets/querosene.png');
     }
 
     create() {

@@ -8,10 +8,10 @@ export default class Level1_Arrival extends Phaser.Scene {
     }
 
    preload() {
-    this.load.image('vaguetti', '/assets/Vaguetti.png');
-    this.load.image('forest_trees', '/assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
-    this.load.image('clean_florest', '/assets/clean_florest.png');
-    this.load.image('moto_foda', '/assets/moto_foda.png');
+    this.load.image('vaguetti', './assets/Vaguetti.png');
+    this.load.image('forest_trees', './assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
+    this.load.image('clean_florest', './assets/clean_florest.png');
+    this.load.image('moto_foda', './assets/moto_foda.png');
 }
 
     create() {

@@ -10,29 +10,29 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('tela_inicial', './assets/tela_inicial.png');
         
         // Carregar frames de animação do Vaguetti
-        this.load.image('vaguetti_frame_0', '/assets/vaguettepng/sprite_vaguette_00000-removebg-preview.png');
-        this.load.image('vaguetti_frame_1', '/assets/vaguettepng/sprite_vaguette_00005-removebg-preview.png');
-        this.load.image('vaguetti_frame_2', '/assets/vaguettepng/sprite_vaguette_00010-removebg-preview.png');
-        this.load.image('vaguetti_frame_3', '/assets/vaguettepng/sprite_vaguette_00015-removebg-preview.png');
-        this.load.image('vaguetti_frame_4', '/assets/vaguettepng/sprite_vaguette_00020-removebg-preview.png');
-        this.load.image('vaguetti_frame_5', '/assets/vaguettepng/sprite_vaguette_00025-removebg-preview.png');
+        this.load.image('vaguetti_frame_0', './assets/vaguettepng/sprite_vaguette_00000-removebg-preview.png');
+        this.load.image('vaguetti_frame_1', './assets/vaguettepng/sprite_vaguette_00005-removebg-preview.png');
+        this.load.image('vaguetti_frame_2', './assets/vaguettepng/sprite_vaguette_00010-removebg-preview.png');
+        this.load.image('vaguetti_frame_3', './assets/vaguettepng/sprite_vaguette_00015-removebg-preview.png');
+        this.load.image('vaguetti_frame_4', './assets/vaguettepng/sprite_vaguette_00020-removebg-preview.png');
+        this.load.image('vaguetti_frame_5', './assets/vaguettepng/sprite_vaguette_00025-removebg-preview.png');
         
         // Imagem estática para fallback
         this.load.image('vaguetti', './assets/Vaguetti.png');
 
         // Monstros principais:
         // skeleton-walk é sprite sheet 192x48 (4 frames 48x48)
-        this.load.spritesheet('enemy_light_tex', '/assets/skeleton-walk.png', {
+        this.load.spritesheet('enemy_light_tex', './assets/skeleton-walk.png', {
             frameWidth: 48,
             frameHeight: 48
         });
 
         // sprite_transparente.gif é gif animado (armazenado como imagem estática em alguns casos)
-        this.load.image('enemy_shadow_tex', '/assets/sprite_transparente.gif');
+        this.load.image('enemy_shadow_tex', './assets/sprite_transparente.gif');
 
         // Assets gerais de fase
-        this.load.image('bg_dark_forest', '/assets/forest/vegetation/dark%20forest.png');
-        this.load.image('moto_foda', '/assets/moto%20foda.png');
+        this.load.image('bg_dark_forest', './assets/forest/vegetation/dark%20forest.png');
+        this.load.image('moto_foda', './assets/moto%20foda.png');
 
 
         this.load.on('loaderror', (file) => {

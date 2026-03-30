@@ -7,8 +7,8 @@ export default class FishingScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('vaguetti', '/assets/Vaguetti.png');
-        this.load.image('first_scene', '/assets/clean_florest.png');
+        this.load.image('vaguetti', './assets/Vaguetti.png');
+        this.load.image('first_scene', './assets/clean_florest.png');
     }
 
     create() {

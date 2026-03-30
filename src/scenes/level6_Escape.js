@@ -8,9 +8,9 @@ export default class level6_Escape extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('vaguetti', '/assets/Vaguetti.png');
-        this.load.image('forest', '/assets/ForestVegetation/Floresta.png');
-        this.load.image('moto', '/assets/moto_foda.png');
+        this.load.image('vaguetti', './assets/Vaguetti.png');
+        this.load.image('forest', './assets/ForestVegetation/Floresta.png');
+        this.load.image('moto', './assets/moto_foda.png');
     }
 
     create() {
