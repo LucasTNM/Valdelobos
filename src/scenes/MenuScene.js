@@ -58,7 +58,7 @@ export default class MenuScene extends Phaser.Scene {
             fontFamily: 'Arial, sans-serif',
             fontSize: titleSize + 'px',
             fontStyle: 'bold',
-            color: '#1a1a1a',
+            color: '#FFFFFF',
             shadow: {
                 offsetX: 3,
                 offsetY: 3,
@@ -95,7 +95,7 @@ export default class MenuScene extends Phaser.Scene {
 
     createMainMenu() {
         const menuItems = [
-            { text: 'INICIAR JOGO', scene: 'Level1_Arrival' },
+            { text: 'INICIAR JOGO', scene: 'Fishing' },
             { text: 'SAIR', scene: null }
         ];
 
