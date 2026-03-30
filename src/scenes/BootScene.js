@@ -18,7 +18,7 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('vaguetti_frame_5', './assets/vaguettepng/sprite_vaguette_00025-removebg-preview.png');
         
         // Imagem estática para fallback
-        this.load.image('vaguetti', './assets/Vaguetti.png');
+        this.load.image('vaguetti', './assets/vaguettepng/default.png');
 
         // Monstros principais:
         // skeleton-walk é sprite sheet 192x48 (4 frames 48x48)
@@ -34,6 +34,47 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('bg_dark_forest', './assets/forest/vegetation/dark%20forest.png');
         this.load.image('moto_foda', './assets/moto%20foda.png');
 
+        // Árvores animadas do Lost Pixel Art
+        this.load.image('tree_1_1', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 1.png');
+        this.load.image('tree_1_2', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 2.png');
+        this.load.image('tree_1_3', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 3.png');
+        this.load.image('tree_1_4', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 4.png');
+        
+        this.load.image('tree_2_1', './assets/Lost Pixel Art - Forest/Trees/Tree_2 - 1.png');
+        this.load.image('tree_2_2', './assets/Lost Pixel Art - Forest/Trees/Tree_2 - 2.png');
+        this.load.image('tree_2_3', './assets/Lost Pixel Art - Forest/Trees/Tree_2 - 3.png');
+        this.load.image('tree_2_4', './assets/Lost Pixel Art - Forest/Trees/Tree_2 - 4.png');
+
+        // Flores animadas
+        this.load.image('flower_1_1', './assets/Flowers/Flower_1 - 1.png');
+        this.load.image('flower_1_2', './assets/Flowers/Flower_1 - 2.png');
+        this.load.image('flower_1_3', './assets/Flowers/Flower_1 - 3.png');
+        this.load.image('flower_1_4', './assets/Flowers/Flower_1 - 4.png');
+
+        this.load.image('flower_2_1', './assets/Flowers/Flower_2 - 1.png');
+        this.load.image('flower_2_2', './assets/Flowers/Flower_2 - 2.png');
+        this.load.image('flower_2_3', './assets/Flowers/Flower_2 - 3.png');
+        this.load.image('flower_2_4', './assets/Flowers/Flower_2 - 4.png');
+
+        this.load.image('flower_3_1', './assets/Flowers/Flower_3 - 1.png');
+        this.load.image('flower_3_2', './assets/Flowers/Flower_3 - 2.png');
+        this.load.image('flower_3_3', './assets/Flowers/Flower_3 - 3.png');
+        this.load.image('flower_3_4', './assets/Flowers/Flower_3 - 4.png');
+
+        this.load.image('flower_4_1', './assets/Flowers/Flower_4 - 1.png');
+        this.load.image('flower_4_2', './assets/Flowers/Flower_4 - 2.png');
+        this.load.image('flower_4_3', './assets/Flowers/Flower_4 - 3.png');
+        this.load.image('flower_4_4', './assets/Flowers/Flower_4 - 4.png');
+
+        // Arbustos
+        this.load.image('bush_1', './assets/Bushes/Bush - 1.png');
+        this.load.image('bush_2', './assets/Bushes/Bush - 2.png');
+
+        // Grama animada
+        this.load.image('grass_1', './assets/Grass/Grass - 1.png');
+        this.load.image('grass_2', './assets/Grass/Grass - 2.png');
+        this.load.image('grass_3', './assets/Grass/Grass - 3.png');
+        this.load.image('grass_4', './assets/Grass/Grass - 4.png');
 
         this.load.on('loaderror', (file) => {
             if (file.key === 'enemy_light_tex' || file.key === 'enemy_shadow_tex') {
@@ -172,6 +213,107 @@ export default class BootScene extends Phaser.Scene {
                 key: 'enemy_shadow_idle',
                 frames: [{ key: 'enemy_shadow_tex', frame: null }],
                 frameRate: 1,
+                repeat: -1
+            });
+        }
+
+        // Animações das árvores
+        if (!this.anims.exists('tree_1_sway')) {
+            this.anims.create({
+                key: 'tree_1_sway',
+                frames: [
+                    { key: 'tree_1_1', frame: 0 },
+                    { key: 'tree_1_2', frame: 0 },
+                    { key: 'tree_1_3', frame: 0 },
+                    { key: 'tree_1_4', frame: 0 }
+                ],
+                frameRate: 3,
+                repeat: -1
+            });
+        }
+
+        if (!this.anims.exists('tree_2_sway')) {
+            this.anims.create({
+                key: 'tree_2_sway',
+                frames: [
+                    { key: 'tree_2_1', frame: 0 },
+                    { key: 'tree_2_2', frame: 0 },
+                    { key: 'tree_2_3', frame: 0 },
+                    { key: 'tree_2_4', frame: 0 }
+                ],
+                frameRate: 3,
+                repeat: -1
+            });
+        }
+
+        // Animações das flores
+        if (!this.anims.exists('flower_1_bloom')) {
+            this.anims.create({
+                key: 'flower_1_bloom',
+                frames: [
+                    { key: 'flower_1_1', frame: 0 },
+                    { key: 'flower_1_2', frame: 0 },
+                    { key: 'flower_1_3', frame: 0 },
+                    { key: 'flower_1_4', frame: 0 }
+                ],
+                frameRate: 4,
+                repeat: -1
+            });
+        }
+
+        if (!this.anims.exists('flower_2_bloom')) {
+            this.anims.create({
+                key: 'flower_2_bloom',
+                frames: [
+                    { key: 'flower_2_1', frame: 0 },
+                    { key: 'flower_2_2', frame: 0 },
+                    { key: 'flower_2_3', frame: 0 },
+                    { key: 'flower_2_4', frame: 0 }
+                ],
+                frameRate: 4,
+                repeat: -1
+            });
+        }
+
+        if (!this.anims.exists('flower_3_bloom')) {
+            this.anims.create({
+                key: 'flower_3_bloom',
+                frames: [
+                    { key: 'flower_3_1', frame: 0 },
+                    { key: 'flower_3_2', frame: 0 },
+                    { key: 'flower_3_3', frame: 0 },
+                    { key: 'flower_3_4', frame: 0 }
+                ],
+                frameRate: 4,
+                repeat: -1
+            });
+        }
+
+        if (!this.anims.exists('flower_4_bloom')) {
+            this.anims.create({
+                key: 'flower_4_bloom',
+                frames: [
+                    { key: 'flower_4_1', frame: 0 },
+                    { key: 'flower_4_2', frame: 0 },
+                    { key: 'flower_4_3', frame: 0 },
+                    { key: 'flower_4_4', frame: 0 }
+                ],
+                frameRate: 4,
+                repeat: -1
+            });
+        }
+
+        // Animações da grama
+        if (!this.anims.exists('grass_sway')) {
+            this.anims.create({
+                key: 'grass_sway',
+                frames: [
+                    { key: 'grass_1', frame: 0 },
+                    { key: 'grass_2', frame: 0 },
+                    { key: 'grass_3', frame: 0 },
+                    { key: 'grass_4', frame: 0 }
+                ],
+                frameRate: 5,
                 repeat: -1
             });
         }

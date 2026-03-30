@@ -7,8 +7,8 @@ export default class FishingScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('vaguetti', './assets/Vaguetti.png');
-        this.load.image('first_scene', './assets/clean_florest.png');
+        this.load.image('vaguetti', './assets/vaguettepng/default.png');
+        this.load.image('fishing_scene', './assets/fishing-scene.png');
     }
 
     create() {
@@ -21,13 +21,13 @@ export default class FishingScene extends Phaser.Scene {
         const mapHeight = 960;
 
         // Adicionar a imagem como fundo preenchendo toda a tela
-        this.add.image(0, 0, 'first_scene').setOrigin(0, 0).setDisplaySize(screenWidth, screenHeight).setDepth(-1);
+        this.add.image(0, 0, 'fishing_scene').setOrigin(0, 0).setDisplaySize(screenWidth, screenHeight).setDepth(-1);
 
         // Configurar limites do mundo para permitir movimento livre
         this.physics.world.setBounds(0, 0, screenWidth, screenHeight);
 
         // Criar o Player
-        this.player = new Player(this, screenWidth * 0.15, screenHeight * 0.6);
+        this.player = new Player(this, screenWidth * 0.75, screenHeight * 0.25);
         const vaguettiScale = 0.35; // Escala bem reduzida
         this.player.setScale(vaguettiScale);
         this.player.body.setSize(this.player.body.width * 0.6, this.player.body.height * 0.6); // Hitbox reduzida
@@ -60,9 +60,6 @@ export default class FishingScene extends Phaser.Scene {
 
         // Controles para avançar
         this.input.keyboard.on('keydown-ENTER', () => this.goToNextScene());
-        
-        // Também permitir clique/toque
-        this.input.once('pointerdown', () => this.goToNextScene());
     }
 
     goToNextScene() {

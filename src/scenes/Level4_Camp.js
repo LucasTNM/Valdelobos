@@ -8,9 +8,8 @@ export default class Level4_Camp extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('vaguetti', './assets/Vaguetti.png');
-        this.load.image('forest_trees', './assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
-        this.load.image('bg_dark_forest', './assets/ForestVegetation/dark_forest.png');
+        this.load.image('vaguetti', './assets/vaguettepng/default.png');
+        this.load.image('bg_dark_forest', './assets/dark_forest.png');
         this.load.image('querosene', './assets/querosene.png');
     }
 
@@ -22,30 +21,18 @@ export default class Level4_Camp extends Phaser.Scene {
         const w = worldWidth;
         const h = worldHeight;
 
-        // Fundo do level (dark forest)
+        // Fundo do level (dark forest) - visível ao fundo
         this.add.image(0, 0, 'bg_dark_forest').setOrigin(0, 0).setDisplaySize(w, h).setDepth(-1);
 
-        const graphics = this.add.graphics();
-
-        // Fundo escuro (Acampamento à noite) com alpha para mostrar a floresta
-        graphics.fillStyle(0x050505, 0.55);
-        graphics.fillRect(0, 0, w, h);
-
-        // Chão de terra
-        graphics.fillStyle(0x2b1d0e, 1);
-        graphics.fillRect(0, h * 0.6, w, h * 0.4);
-
-        // Árvores ao fundo
-        this.createCampForest(w, h);
-
-        // Barracas rasgadas (Cena 4)
-        this.createTents(graphics, h);
-
-        // Fogueira apagada
-        this.createCampfire(graphics, w * 0.5, h * 0.7);
+        // Overlay escuro semitransparente para criar atmosfera noturna
+        const darkOverlay = this.add.graphics();
+        darkOverlay.fillStyle(0x000000, 0.6);
+        darkOverlay.fillRect(0, 0, w, h);
+        darkOverlay.setDepth(5);
+        darkOverlay.setScrollFactor(0, 0);
 
         // Player
-        this.player = new Player(this, 100, h * 0.7);
+        this.player = new Player(this, w * 0.2, h * 0.7);
         const vaguettiScale = Math.min(h / 600, 1) * 0.7;
         this.player.setScale(vaguettiScale);
         this.player.setDepth(10);
@@ -56,13 +43,6 @@ export default class Level4_Camp extends Phaser.Scene {
         // Grupo de Inimigos
         this.enemies = this.physics.add.group({ runChildUpdate: true });
         this.spawnEnemies(w, h);
-
-        // Night Overlay
-        this.nightOverlay = this.add.graphics();
-        this.nightOverlay.fillStyle(0x000000, 0.9);
-        this.nightOverlay.fillRect(0, 0, w, h);
-        this.nightOverlay.setScrollFactor(0);
-        this.nightOverlay.setDepth(100);
 
         // Câmera
         this.cameras.main.setBounds(0, 0, w, h);
@@ -92,7 +72,8 @@ export default class Level4_Camp extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.transitionZone, () => {
             this.continueGame();
         });
-        // Partículas de névoa no acampamento
+
+        // Partículas de névoa
         this.add.particles(0, 0, 'fog_texture_l1', {
             speed: { min: -10, max: 10 },
             scale: { start: 2, end: 0 },
@@ -105,49 +86,7 @@ export default class Level4_Camp extends Phaser.Scene {
         }).setDepth(15);
     }
 
-    createCampForest(w, h) {
-        for (let i = 0; i < 15; i++) {
-            const x = Math.random() * w;
-            const tree = this.add.sprite(x, h * 0.4, 'forest_trees');
-            tree.setScale(0.4 + Math.random() * 0.2);
-            tree.setTint(0x1a1a1a);
-        }
-    }
 
-    createTents(graphics, h) {
-        const tentX = [400, 800, 1200];
-        tentX.forEach(x => {
-            graphics.fillStyle(0x4a412a, 1);
-            graphics.beginPath();
-            graphics.moveTo(x - 60, h * 0.7);
-            graphics.lineTo(x, h * 0.6);
-            graphics.lineTo(x + 60, h * 0.7);
-            graphics.closePath();
-            graphics.fillPath();
-            
-            // Rasgos
-            graphics.lineStyle(2, 0x000000, 0.8);
-            graphics.beginPath();
-            graphics.moveTo(x - 10, h * 0.65);
-            graphics.lineTo(x + 5, h * 0.68);
-            graphics.strokePath();
-        });
-    }
-
-    createCampfire(graphics, x, y) {
-        graphics.fillStyle(0x333333, 1);
-        for (let i = 0; i < 5; i++) {
-            graphics.fillCircle(x + (i - 2) * 15, y, 10);
-        }
-        // Cinzas
-        graphics.fillStyle(0x111111, 1);
-        graphics.fillEllipse(x, y, 60, 20);
-
-        // Algumas toras de madeira
-        graphics.fillStyle(0x3a2a1a, 1);
-        graphics.fillRect(x - 40, y - 5, 30, 10);
-        graphics.fillRect(x + 10, y - 5, 30, 10);
-    }
 
     createFuelItems(w, h) {
         this.fuelGroup = this.physics.add.group();
@@ -234,7 +173,7 @@ export default class Level4_Camp extends Phaser.Scene {
         this.isTransitioning = true;
         this.cameras.main.fade(500, 0, 0, 0);
         this.time.delayedCall(500, () => {
-            this.scene.start('level6_Escape');
+            this.scene.start('Level5_DarkForest');
         });
     }
 

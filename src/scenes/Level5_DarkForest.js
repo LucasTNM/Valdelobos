@@ -8,7 +8,7 @@ export default class Level5_DarkForest extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('vaguetti', './assets/Vaguetti.png');
+        this.load.image('vaguetti', './assets/vaguettepng/default.png');
         this.load.image('dark_forest', './assets/dark_forest.png');
     }
 
@@ -56,6 +56,7 @@ export default class Level5_DarkForest extends Phaser.Scene {
             this.continueGame();
         });
     }
+
     continueGame() {
         if (this.isTransitioning) return;
         this.isTransitioning = true;

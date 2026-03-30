@@ -24,11 +24,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.fuelConsumptionRate = 1.5; // Por segundo (luz normal)
         this.attackConsumptionRate = 10; // Extra por segundo ao atacar
         this.isAttacking = false;
-        this.isLightOn = true; // Novo estado: lampião ligado/desligado
+        this.isLightOn = false; // Novo estado: lampião ligado/desligado
+        
+        // Armazenar a posição Y original para correto posicionamento da luz
+        this.baseY = y;
+        // Y offset para o lampião - ajustado para posição na cabeça do personagem
+        this.lightYOffset = -60;
         
         // Luz do Lampião (Cor âmbar/quente)
         this.lightRadius = 200;
-        this.light = scene.add.image(x, y, 'light_mask');
+        this.light = scene.add.image(x, y + this.lightYOffset, 'light_mask');
         this.light.setDisplaySize(this.lightRadius * 2, this.lightRadius * 2);
         this.light.setAlpha(0.6);
         this.light.setTint(0xffcc66); // Cor âmbar de lampião
@@ -114,7 +119,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.isAttacking = true;
             this.beam.setAlpha(0.8);
             this.beam.setX(this.x);
-            this.beam.setY(this.y - 40); // Ajuste para altura do lampião
+            this.beam.setY(this.y + this.lightYOffset); // Usar o mesmo offset que a luz
             this.beam.setRotation(this.flipX ? Math.PI : 0);
             
             // Faíscas ao atacar
@@ -168,7 +173,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         // Atualizar posições dos efeitos
-        this.light.setPosition(this.x, this.y - 40);
+        this.light.setPosition(this.x, this.y + this.lightYOffset);
         this.updateFuelBar();
     }
 
