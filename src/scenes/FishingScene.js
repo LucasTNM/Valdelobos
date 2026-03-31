@@ -7,8 +7,9 @@ export default class FishingScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('vaguetti', './assets/vaguettepng/default.png');
+        this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
         this.load.image('fishing_scene', './assets/fishing-scene.png');
+        this.load.image('moto_foda', './assets/moto_foda.png');
     }
 
     create() {
@@ -22,6 +23,10 @@ export default class FishingScene extends Phaser.Scene {
 
         // Adicionar a imagem como fundo preenchendo toda a tela
         this.add.image(0, 0, 'fishing_scene').setOrigin(0, 0).setDisplaySize(screenWidth, screenHeight).setDepth(-1);
+
+        // Adicionar a moto no canto superior esquerdo (narrativa: personagem chegou de moto)
+        const moto = this.add.image(screenWidth * 0.05, screenHeight * 0.05, 'moto_foda').setOrigin(0, 0);
+        moto.setScale(0.3).setDepth(5);
 
         // Configurar limites do mundo para permitir movimento livre
         this.physics.world.setBounds(0, 0, screenWidth, screenHeight);

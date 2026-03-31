@@ -5,10 +5,12 @@ import Enemy from '../entities/Enemy';
 export default class Level1_Arrival extends Phaser.Scene {
     constructor() {
         super('Level1_Arrival');
+        this.lastDamageTime = 0;
+        this.damageCooldown = 1000; // 1 segundo entre danos
     }
 
    preload() {
-    this.load.image('vaguetti', './assets/vaguettepng/default.png');
+    this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
     this.load.image('forest_trees', './assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
     this.load.image('clean_florest', './assets/clean_florest.png');
     this.load.image('moto_foda', './assets/moto_foda.png');
@@ -86,9 +88,7 @@ export default class Level1_Arrival extends Phaser.Scene {
         });
 
         // Colisões (apenas para dano no player por enquanto)
-        this.physics.add.overlap(this.player, this.enemies, (p, e) => {
-            this.player.takeDamage(10);
-        });
+        this.physics.add.overlap(this.player, this.enemies, (p, e) => this.handlePlayerDamage(e));
 
         // Configurar Câmera
         this.cameras.main.setBounds(0, 0, w, h);
@@ -267,8 +267,19 @@ export default class Level1_Arrival extends Phaser.Scene {
         this.enemies.add(enemy);
     }
 
-    handlePlayerDamage() {
-        this.player.takeDamage(20);
+    handlePlayerDamage(enemy) {
+        // Verificar cooldown para não dar dano múltiplas vezes rapidamente
+        const now = this.time.now;
+        if (now - this.lastDamageTime < this.damageCooldown) {
+            return;
+        }
+        this.lastDamageTime = now;
+        
+        // Inimigo de sombra só causa dano se a luz estiver desligada
+        if (enemy.type === 'shadow' && this.player.isLightOn) {
+            return; // Não causa dano
+        }
+        this.player.takeDamage(10);
     }
 
     gameOver() {

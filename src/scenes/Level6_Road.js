@@ -5,10 +5,12 @@ import Enemy from '../entities/Enemy';
 export default class Level6_Road extends Phaser.Scene {
     constructor() {
         super('Level6_Road');
+        this.lastDamageTime = 0;
+        this.damageCooldown = 1000; // 1 segundo entre danos
     }
 
     preload() {
-        this.load.image('vaguetti', './assets/vaguettepng/default.png');
+        this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
         this.load.image('road', './assets/road.png');
         this.load.image('moto', './assets/moto_foda.png');
     }
@@ -17,13 +19,13 @@ export default class Level6_Road extends Phaser.Scene {
         const w = this.scale.width;
         const h = this.scale.height;
 
-        // Aumentar o mundo para acomodar 3x o background
-        const worldWidth = w * 3;
+        // Aumentar o mundo para acomodar movimento para frente (5x o background)
+        const worldWidth = w * 5;
         const worldHeight = h;
         this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
 
-        // Fundo: Road repetido 3 vezes
-        for (let i = 0; i < 3; i++) {
+        // Fundo: Road repetido 5 vezes
+        for (let i = 0; i < 5; i++) {
             this.add.image(i * w, 0, 'road')
                 .setOrigin(0, 0)
                 .setDisplaySize(w, h)
@@ -44,7 +46,7 @@ export default class Level6_Road extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, worldWidth, worldHeight);
 
         // A Moto (Objetivo Final) - no final da estrada
-        this.motoContainer = this.add.container(worldWidth * 0.95, h * 0.7);
+        this.motoContainer = this.add.container(worldWidth * 0.75, h * 0.7);
         const motoImg = this.add.image(0, 0, 'moto');
         motoImg.setScale(0.8);
         this.motoContainer.add(motoImg);
@@ -66,7 +68,7 @@ export default class Level6_Road extends Phaser.Scene {
             }
         });
 
-        this.physics.add.overlap(this.player, this.enemies, () => this.handlePlayerDamage());
+        this.physics.add.overlap(this.player, this.enemies, (p, e) => this.handlePlayerDamage(e));
 
         // UI
         const titleSize = Math.max(24, w / 25);
@@ -174,29 +176,56 @@ export default class Level6_Road extends Phaser.Scene {
     victory() {
         if (this.isEnding) return;
         this.isEnding = true;
-        this.player.setVisible(false);
-        this.player.light.setVisible(false);
-        this.player.fuelBar.setVisible(false);
+        
+        // Fazer a câmera parar de seguir o player
+        this.cameras.main.stopFollow();
         
         // Destruir inimigos restantes
         this.enemies.clear(true, true);
         
         const w = this.scale.width;
         const h = this.scale.height;
+        const worldWidth = w * 5;
+        
+        // Animar o player e a moto saindo da tela para FRENTE (aumentando X)
+        this.tweens.add({
+            targets: this.player,
+            x: worldWidth * 0.9,
+            duration: 3000,
+            ease: 'Linear'
+        });
+        
+        this.tweens.add({
+            targets: this.motoContainer,
+            x: worldWidth * 0.95,
+            duration: 3000,
+            ease: 'Linear'
+        });
 
         this.add.text(w * 0.5, h * 0.5, 'VOCÊ ESCAPOU!', {
             fontFamily: 'Arial, sans-serif',
             fontSize: '64px',
             color: '#00FF00',
             fontStyle: 'bold'
-        }).setOrigin(0.5).setDepth(200);
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(200);
 
         this.time.delayedCall(3000, () => {
             this.scene.start('MenuScene');
         });
     }
 
-    handlePlayerDamage() {
+    handlePlayerDamage(enemy) {
+        // Verificar cooldown para não dar dano múltiplas vezes rapidamente
+        const now = this.time.now;
+        if (now - this.lastDamageTime < this.damageCooldown) {
+            return;
+        }
+        this.lastDamageTime = now;
+        
+        // Inimigo de sombra só causa dano se a luz estiver desligada
+        if (enemy.type === 'shadow' && this.player.isLightOn) {
+            return; // Não causa dano
+        }
         this.player.takeDamage(25);
     }
 

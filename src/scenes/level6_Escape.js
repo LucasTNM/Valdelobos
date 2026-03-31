@@ -2,13 +2,15 @@ import Phaser from 'phaser';
 import Player from '../entities/Player';
 import Enemy from '../entities/Enemy';
 
-export default class Level5_DarkForest extends Phaser.Scene {
+export default class Level6_Escape extends Phaser.Scene {
     constructor() {
-        super('Level5_DarkForest');
+        super('Level6_Escape');
+        this.lastDamageTime = 0;
+        this.damageCooldown = 1000; // 1 segundo entre danos
     }
 
     preload() {
-        this.load.image('vaguetti', './assets/Vaguetti.png');
+        this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
         this.load.image('dark_forest', './assets/dark_forest.png');
     }
 
@@ -32,7 +34,7 @@ export default class Level5_DarkForest extends Phaser.Scene {
         this.enemies = this.physics.add.group({ runChildUpdate: true });
         this.spawnEnemies(w, h);
 
-        this.physics.add.overlap(this.player, this.enemies, () => this.handlePlayerDamage());
+        this.physics.add.overlap(this.player, this.enemies, (p, e) => this.handlePlayerDamage(e));
 
         // UI
         const titleSize = Math.max(24, w / 25);
@@ -76,7 +78,18 @@ export default class Level5_DarkForest extends Phaser.Scene {
         }
     }
 
-    handlePlayerDamage() {
+    handlePlayerDamage(enemy) {
+        // Verificar cooldown para não dar dano múltiplas vezes rapidamente
+        const now = this.time.now;
+        if (now - this.lastDamageTime < this.damageCooldown) {
+            return;
+        }
+        this.lastDamageTime = now;
+        
+        // Inimigo de sombra só causa dano se a luz estiver desligada
+        if (enemy.type === 'shadow' && this.player.isLightOn) {
+            return; // Não causa dano
+        }
         this.player.takeDamage(25);
     }
 

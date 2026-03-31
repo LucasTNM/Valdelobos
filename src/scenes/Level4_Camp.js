@@ -5,10 +5,12 @@ import Enemy from '../entities/Enemy';
 export default class Level4_Camp extends Phaser.Scene {
     constructor() {
         super('Level4_Camp');
+        this.lastDamageTime = 0;
+        this.damageCooldown = 1000; // 1 segundo entre danos
     }
 
     preload() {
-        this.load.image('vaguetti', './assets/vaguettepng/default.png');
+        this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
         this.load.image('bg_dark_forest', './assets/dark_forest.png');
         this.load.image('querosene', './assets/querosene.png');
     }
@@ -146,7 +148,7 @@ export default class Level4_Camp extends Phaser.Scene {
             });
         });
 
-        this.physics.add.overlap(this.player, this.enemies, () => this.handlePlayerDamage());
+        this.physics.add.overlap(this.player, this.enemies, (p, e) => this.handlePlayerDamage(e));
     }
 
     spawnEnemies(w, h) {
@@ -160,7 +162,18 @@ export default class Level4_Camp extends Phaser.Scene {
         }
     }
 
-    handlePlayerDamage() {
+    handlePlayerDamage(enemy) {
+        // Verificar cooldown para não dar dano múltiplas vezes rapidamente
+        const now = this.time.now;
+        if (now - this.lastDamageTime < this.damageCooldown) {
+            return;
+        }
+        this.lastDamageTime = now;
+        
+        // Inimigo de sombra só causa dano se a luz estiver desligada
+        if (enemy.type === 'shadow' && this.player.isLightOn) {
+            return; // Não causa dano
+        }
         this.player.takeDamage(20);
     }
 

@@ -12,6 +12,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setCollideWorldBounds(true);
         this.setOrigin(0.5, 1);
         
+        // Ajustar hitbox do player para ser mais precisa
+        if (this.body) {
+            const bodyWidth = this.displayWidth * 0.35;
+            const bodyHeight = this.displayHeight * 0.45;
+            const offsetX = (this.displayWidth - bodyWidth) / 2;
+            const offsetY = (this.displayHeight - bodyHeight);
+            this.body.setSize(bodyWidth, bodyHeight);
+            this.body.setOffset(offsetX, offsetY);
+        }
+        
         // Velocidade de movimento
         this.speed = 200;
 
@@ -28,12 +38,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         
         // Armazenar a posição Y original para correto posicionamento da luz
         this.baseY = y;
-        // Y offset para o lampião - ajustado para posição na cabeça do personagem
-        this.lightYOffset = -60;
+        // Offsets para o lampião - ajustado para posição na cabeça do personagem
+        this.lightYOffset = -250; // Para cima
+        this.lightXOffset = 60;   // Para frente
         
         // Luz do Lampião (Cor âmbar/quente)
         this.lightRadius = 200;
-        this.light = scene.add.image(x, y + this.lightYOffset, 'light_mask');
+        this.light = scene.add.image(x + this.lightXOffset, y + this.lightYOffset, 'light_mask');
         this.light.setDisplaySize(this.lightRadius * 2, this.lightRadius * 2);
         this.light.setAlpha(0.6);
         this.light.setTint(0xffcc66); // Cor âmbar de lampião
@@ -118,7 +129,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (this.cursors.space.isDown && this.fuel > 0 && this.isLightOn) {
             this.isAttacking = true;
             this.beam.setAlpha(0.8);
-            this.beam.setX(this.x);
+            this.beam.setX(this.x + this.lightXOffset);
             this.beam.setY(this.y + this.lightYOffset); // Usar o mesmo offset que a luz
             this.beam.setRotation(this.flipX ? Math.PI : 0);
             
@@ -173,7 +184,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         // Atualizar posições dos efeitos
-        this.light.setPosition(this.x, this.y + this.lightYOffset);
+        this.light.setPosition(this.x + this.lightXOffset, this.y + this.lightYOffset);
         this.updateFuelBar();
     }
 

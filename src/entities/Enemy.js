@@ -7,7 +7,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
 
         this.type = type; // 'light' ou 'shadow'
-        this.setCollideWorldBounds(true);
+        this.setCollideWorldBounds(false); // Desativar colisão com bordas do mundo
         this.speed = type === 'light' ? 80 : 120;
         this.maxHealth = 60;
         this.health = 60;
@@ -15,21 +15,24 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         // Ajustar escala baseando no tamanho do jogador para ficar equivalente
         if (scene.player && scene.player.height > 0 && this.height > 0) {
             const heroDisplayHeight = scene.player.height * scene.player.scaleY;
-            const targetHeight = heroDisplayHeight * 0.9; // um pouco menor que o herói
+            const targetHeight = heroDisplayHeight * 0.5; // reduzido para 50% do herói
             const scale = targetHeight / this.height;
             this.setScale(scale);
         } else {
-            this.setScale(1.5);
+            this.setScale(0.8); // fallback menor também
         }
 
         this.setOrigin(0.5, 1); // igual ao jogador para alinhamento de chão
 
-        // Collision body se base no tamanho real (para sprite redimensionada)
-        if (this.body && this.body.setSize) {
-            const bodyWidth = this.displayWidth * 0.8;
-            const bodyHeight = this.displayHeight * 0.85;
+        // Collision body - MUITO MENOR e mais preciso
+        if (this.body) {
+            // Hitbox minúscula - apenas o core do corpo
+            const bodyWidth = this.displayWidth * 0.35;
+            const bodyHeight = this.displayHeight * 0.45;
+            const offsetX = (this.displayWidth - bodyWidth) / 2;
+            const offsetY = (this.displayHeight - bodyHeight);
             this.body.setSize(bodyWidth, bodyHeight);
-            this.body.setOffset((this.displayWidth - bodyWidth) / 2, this.displayHeight - bodyHeight);
+            this.body.setOffset(offsetX, offsetY);
         }
 
         // Barra de vida do inimigo

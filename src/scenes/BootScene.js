@@ -9,16 +9,16 @@ export default class BootScene extends Phaser.Scene {
         // Carregar a imagem do personagem
         this.load.image('tela_inicial', './assets/tela_inicial.png');
         
-        // Carregar frames de animação do Vaguetti
-        this.load.image('vaguetti_frame_0', './assets/vaguettepng/sprite_vaguette_00000-removebg-preview.png');
-        this.load.image('vaguetti_frame_1', './assets/vaguettepng/sprite_vaguette_00005-removebg-preview.png');
-        this.load.image('vaguetti_frame_2', './assets/vaguettepng/sprite_vaguette_00010-removebg-preview.png');
-        this.load.image('vaguetti_frame_3', './assets/vaguettepng/sprite_vaguette_00015-removebg-preview.png');
-        this.load.image('vaguetti_frame_4', './assets/vaguettepng/sprite_vaguette_00020-removebg-preview.png');
-        this.load.image('vaguetti_frame_5', './assets/vaguettepng/sprite_vaguette_00025-removebg-preview.png');
+        // Carregar frames de animação do Vaguetti (sprites 1-6 são animação, sprite 7 é default)
+        this.load.image('vaguetti_frame_0', './assets/Vaguetti/sprite_vaguettev2_fundoremovido1.png');
+        this.load.image('vaguetti_frame_1', './assets/Vaguetti/sprite_vaguettev2_fundoremovido2.png');
+        this.load.image('vaguetti_frame_2', './assets/Vaguetti/sprite_vaguettev2_fundoremovido3.png');
+        this.load.image('vaguetti_frame_3', './assets/Vaguetti/sprite_vaguettev2_fundoremovido4.png');
+        this.load.image('vaguetti_frame_4', './assets/Vaguetti/sprite_vaguettev2_fundoremovido5.png');
+        this.load.image('vaguetti_frame_5', './assets/Vaguetti/sprite_vaguettev2_fundoremovido6.png');
         
-        // Imagem estática para fallback
-        this.load.image('vaguetti', './assets/vaguettepng/default.png');
+        // Imagem estática para fallback (sprite 7 é o default)
+        this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
 
         // Monstros principais:
         // skeleton-walk é sprite sheet 192x48 (4 frames 48x48)
@@ -32,7 +32,7 @@ export default class BootScene extends Phaser.Scene {
 
         // Assets gerais de fase
         this.load.image('bg_dark_forest', './assets/forest/vegetation/dark%20forest.png');
-        this.load.image('moto_foda', './assets/moto%20foda.png');
+        this.load.image('moto_foda', './assets/moto_foda.png');
 
         // Árvores animadas do Lost Pixel Art
         this.load.image('tree_1_1', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 1.png');
