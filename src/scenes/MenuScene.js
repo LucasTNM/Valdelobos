@@ -95,7 +95,7 @@ export default class MenuScene extends Phaser.Scene {
 
     createMainMenu() {
         const menuItems = [
-            { text: 'INICIAR JOGO', scene: 'Level1_Arrival' },
+            { text: 'INICIAR JOGO', scene: 'Fishing' },
             { text: 'SAIR', scene: null }
         ];
 
@@ -170,14 +170,16 @@ export default class MenuScene extends Phaser.Scene {
 
     highlightButton(index) {
         this.buttons.forEach((btn, i) => {
-            if (i === index) {
+            if (i === index && btn && btn.bg && btn.text) {
                 btn.bg.clear();
                 btn.bg.fillStyle(0xFF6B00, 0.9);
                 btn.bg.fillRoundedRect(-120, -20, 240, 40, 8);
                 btn.bg.lineStyle(3, 0xFFFFFF, 1);
                 btn.bg.strokeRoundedRect(-120, -20, 240, 40, 8);
 
-                btn.text.setColor('#FFFFFF');
+                if (btn.text) {
+                    btn.text.setColor('#FFFFFF');
+                }
                 btn.setScale(1.05);
 
                 // Efeito de luz
@@ -188,14 +190,16 @@ export default class MenuScene extends Phaser.Scene {
                     duration: 300,
                     ease: 'Power2.easeOut'
                 });
-            } else {
+            } else if (btn && btn.bg && btn.text) {
                 btn.bg.clear();
                 btn.bg.fillStyle(0x2a2a2a, 0.8);
                 btn.bg.fillRoundedRect(-120, -20, 240, 40, 8);
                 btn.bg.lineStyle(2, 0xFF6B00, 0.5);
                 btn.bg.strokeRoundedRect(-120, -20, 240, 40, 8);
 
-                btn.text.setColor('#FFD700');
+                if (btn.text) {
+                    btn.text.setColor('#FFD700');
+                }
                 btn.setScale(1);
             }
         });

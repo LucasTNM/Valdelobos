@@ -1,10 +1,13 @@
 import Phaser from 'phaser';
 import BootScene from './scenes/BootScene';
 import MenuScene from './scenes/MenuScene';
+import FishingScene from './scenes/FishingScene';
 import Level1_Arrival from './scenes/Level1_Arrival';
 import Level4_Camp from './scenes/Level4_Camp';
-import level6_Escape from './scenes/level6_Escape';
+import Level5_DarkForest from './scenes/Level5_DarkForest';
+import Level6_Road from './scenes/Level6_Road';
 import GameOver from './scenes/GameOver';
+import IntroScene from './scenes/IntroScene';
 
 const config = {
     type: Phaser.AUTO,
@@ -27,10 +30,13 @@ const config = {
     },
     scene: [
         BootScene,
+        IntroScene,
         MenuScene,
+        FishingScene,
         Level1_Arrival,
         Level4_Camp,
-        level6_Escape,
+        Level5_DarkForest,
+        Level6_Road,
         GameOver
     ]
 };

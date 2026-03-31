@@ -1,0 +1,49 @@
+# .github/workflows/deploy.yml
+name: Deploy do Jogo para o GitHub Pages
+
+on:
+  push:
+    branches: ['main']
+
+# Configura as permissões para o GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Fazer o Build do Jogo (Vite)
+        run: npm run build
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Fazer Upload dos arquivos do Build
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist' # O Vite gera o jogo final nesta pasta
+
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

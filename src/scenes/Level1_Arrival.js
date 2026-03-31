@@ -5,12 +5,12 @@ import Enemy from '../entities/Enemy';
 export default class Level1_Arrival extends Phaser.Scene {
     constructor() {
         super('Level1_Arrival');
+        this.lastDamageTime = 0;
+        this.damageCooldown = 1000; // 1 segundo entre danos
     }
 
-    preload() {
-        // O Vite serve a pasta "public" na raiz. Comece direto pelo nome da pasta.
-        this.load.image('vaguetti', '/assets/Vaguetti.png');
-        this.load.image('forest_trees', '/assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
+   preload() {
+        // Assets já são carregados em BootScene - não duplicar aqui
     }
 
     create() {
@@ -23,37 +23,22 @@ export default class Level1_Arrival extends Phaser.Scene {
         this.input.keyboard.off('keydown-SPACE');
         this.input.keyboard.off('keydown-ESC');
 
-        // Fundo - céu/floresta ao fundo - RESPONSIVO
-        const graphics = this.add.graphics();
+        // Fundo - Dark Forest - RESPONSIVO
         const w = worldWidth;
         const h = worldHeight;
         
-        // Céu noturno degradado (estendido)
-        graphics.fillStyle(0x0a0a1a, 1);
-        graphics.fillRect(0, 0, w, h * 0.5);
-        
-        graphics.fillStyle(0x1a0a0a, 1);
-        graphics.fillRect(0, h * 0.5, w, h * 0.5);
+        // Fundo do level (clean florest) como background principal
+        this.add.image(0, 0, 'clean_florest').setOrigin(0, 0).setDisplaySize(w, h).setDepth(-1);
 
-        // Grama/fundo verde escuro (estendido)
-        graphics.fillStyle(0x0d3d0d, 1);
-        graphics.fillRect(0, h * 0.58, w, h * 0.42);
+        // Criar árvores animadas nas partes superior e inferior
+        this.createAnimatedTrees(w, h);
 
-        // Camada de árvores ao fundo (usando sprite)
-        this.createBackgroundForest(w, h);
+        // Criar flores, arbustos e grama
+        this.createFlora(w, h);
 
-        // Estrada principal
-        this.createRoad(graphics, w, h);
-
-        // Árvores nas laterais com sprites
-        this.createSideTreesWithSprites(w, h);
-
-        // Moto na estrada (estacionada perto da chegada)
-        this.createMotorcycle(graphics, this.scale.width * 0.75, h * 0.7);
-
-        // Camada de escuridão (Night Overlay)
+        // Camada de escuridão (Night Overlay) - Crepúsculo (6:30 da noite)
         this.nightOverlay = this.add.graphics();
-        this.nightOverlay.fillStyle(0x000000, 0);
+        this.nightOverlay.fillStyle(0x000000, 0.5); // Começa já escuro (50% opaco)
         this.nightOverlay.fillRect(0, 0, w, h);
         this.nightOverlay.setScrollFactor(0);
         this.nightOverlay.setDepth(100); // Acima de tudo exceto luz e UI
@@ -61,7 +46,7 @@ export default class Level1_Arrival extends Phaser.Scene {
         // Transição suave para o pôr do sol
         this.tweens.add({
             targets: this.nightOverlay,
-            alpha: 0.8,
+            alpha: 0.7, // Fica ainda mais escuro ao passar do tempo
             duration: 5000, // 5 segundos para escurecer
             delay: 3000
         });
@@ -73,7 +58,7 @@ export default class Level1_Arrival extends Phaser.Scene {
 
         // Personagem Vaguetti (Player)
         this.player = new Player(this, this.scale.width * 0.15, h * 0.65);
-        const vaguettiScale = Math.min(h / 600, 1) * 0.7;
+        const vaguettiScale = Math.min(h / 600, 1) * 1.0;
         this.player.setScale(vaguettiScale);
         this.player.setDepth(10);
         this.player.light.setDepth(101); // Acima da escuridão
@@ -100,9 +85,7 @@ export default class Level1_Arrival extends Phaser.Scene {
         });
 
         // Colisões (apenas para dano no player por enquanto)
-        this.physics.add.overlap(this.player, this.enemies, (p, e) => {
-            this.player.takeDamage(10);
-        });
+        this.physics.add.overlap(this.player, this.enemies, (p, e) => this.handlePlayerDamage(e));
 
         // Configurar Câmera
         this.cameras.main.setBounds(0, 0, w, h);
@@ -281,8 +264,23 @@ export default class Level1_Arrival extends Phaser.Scene {
         this.enemies.add(enemy);
     }
 
-    handlePlayerDamage() {
-        this.player.takeDamage(20);
+    handlePlayerDamage(enemy) {
+        // Verificar cooldown para não dar dano múltiplas vezes rapidamente
+        const now = this.time.now;
+        if (now - this.lastDamageTime < this.damageCooldown) {
+            return;
+        }
+        this.lastDamageTime = now;
+        
+        // Inimigo de sombra só causa dano se a luz estiver desligada
+        if (enemy.type === 'shadow' && this.player.isLightOn) {
+            return; // Não causa dano
+        }
+        // Inimigo de luz só causa dano se a luz estiver ligada
+        if (enemy.type === 'light' && !this.player.isLightOn) {
+            return; // Não causa dano
+        }
+        this.player.takeDamage(10);
     }
 
     gameOver() {
@@ -292,6 +290,88 @@ export default class Level1_Arrival extends Phaser.Scene {
         this.time.delayedCall(1000, () => {
             this.scene.start('GameOver');
         });
+    }
+
+    createAnimatedTrees(w, h) {
+        // Árvores na parte superior (background/fundo) - distribuição mais caótica
+        const topSpacing = 280;
+        const topTreeCount = Math.ceil(w / topSpacing) + 3;
+        
+        for (let i = 0; i < topTreeCount; i++) {
+            const x = i * topSpacing + Math.random() * 200 - 50; // Mais aleatoriedade
+            const y = h * 0.12 + Math.random() * 60; // Altura mais variável
+            const treeType = Math.random() > 0.5 ? 'tree_1_sway' : 'tree_2_sway';
+            const scale = 0.5 + Math.random() * 0.5; // Tamanho mais variável
+            const tree = this.add.sprite(x, y, treeType === 'tree_1_sway' ? 'tree_1_1' : 'tree_2_1');
+            tree.setScale(scale);
+            tree.setDepth(3);
+            tree.play(treeType);
+        }
+
+        // Árvores na parte inferior (frente) - distribuição caótica
+        const bottomSpacing = 250;
+        const bottomTreeCount = Math.ceil(w / bottomSpacing) + 3;
+        
+        for (let i = 0; i < bottomTreeCount; i++) {
+            const x = i * bottomSpacing + Math.random() * 250 - 100; // Muito mais aleatoriedade
+            const y = h * 0.82 + Math.random() * 40; // Altura variável
+            const treeType = Math.random() > 0.5 ? 'tree_1_sway' : 'tree_2_sway';
+            const scale = 0.7 + Math.random() * 0.5; // Tamanho variável
+            const tree = this.add.sprite(x, y, treeType === 'tree_1_sway' ? 'tree_1_1' : 'tree_2_1');
+            tree.setScale(scale);
+            tree.setDepth(25); // Na frente do player
+            tree.play(treeType);
+        }
+    }
+
+    createFlora(w, h) {
+        // Grama na parte inferior do cenário - mais distribuída
+        const grassSpacing = 120;
+        const grassCount = Math.ceil(w / grassSpacing) + 5;
+        
+        for (let i = 0; i < grassCount; i++) {
+            const x = i * grassSpacing + Math.random() * 80 - 40;
+            const y = h * 0.84 + Math.random() * 25; // Mais variação de altura
+            const grass = this.add.sprite(x, y, 'grass_1');
+            grass.setScale(0.4 + Math.random() * 0.35);
+            grass.setDepth(22); // Abaixo das árvores inferiores
+            grass.play('grass_sway');
+        }
+
+        // Arbustos espalhados pelo cenário - distribuição mais natural
+        const bushSpacing = 350;
+        const bushCount = Math.ceil(w / bushSpacing) + 4;
+        
+        for (let i = 0; i < bushCount; i++) {
+            const x = i * bushSpacing + Math.random() * 200 - 100;
+            const yVariation = Math.random() > 0.5 ? h * 0.20 : h * 0.78; // Parte superior ou inferior
+            const y = yVariation + Math.random() * 40;
+            const bushType = Math.random() > 0.5 ? 'bush_1' : 'bush_2';
+            const bush = this.add.sprite(x, y, bushType);
+            bush.setScale(0.4 + Math.random() * 0.35);
+            
+            if (yVariation > h * 0.5) {
+                bush.setDepth(23); // Acima das flores, abaixo das árvores inferiores
+            } else {
+                bush.setDepth(2); // Atrás se for na parte superior
+            }
+        }
+
+        // Flores distribuídas pelo cenário - MUITO MENORES E MAIS BAIXAS
+        const flowerSpacing = 180;
+        const flowerCount = Math.ceil(w / flowerSpacing) + 8;
+        const flowerTypes = ['flower_1_bloom', 'flower_2_bloom', 'flower_3_bloom', 'flower_4_bloom'];
+        const flowerFirstFrames = ['flower_1_1', 'flower_2_1', 'flower_3_1', 'flower_4_1'];
+        
+        for (let i = 0; i < flowerCount; i++) {
+            const x = i * flowerSpacing + Math.random() * 120 - 60;
+            const y = h * 0.87 + Math.random() * 20; // Bem perto do chão
+            const flowerIndex = Math.floor(Math.random() * flowerTypes.length);
+            const flower = this.add.sprite(x, y, flowerFirstFrames[flowerIndex]);
+            flower.setScale(0.18 + Math.random() * 0.15); // MUITO MENOR (era 0.4-0.8)
+            flower.setDepth(21); // Abaixo da grama e arbustos inferiores mas acima de tudo na base
+            flower.play(flowerTypes[flowerIndex]);
+        }
     }
 
     update() {
@@ -319,4 +399,3 @@ export default class Level1_Arrival extends Phaser.Scene {
         }
     }
 }
-

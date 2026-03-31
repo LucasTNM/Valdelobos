@@ -8,8 +8,99 @@ export default class BootScene extends Phaser.Scene {
     preload() {
         // Carregar a imagem do personagem
         this.load.image('tela_inicial', './assets/tela_inicial.png');
-        this.load.image('hero', './assets/hero.png');
-        this.load.image('vaguetti', './assets/Vaguetti.png');
+        
+        // Carregar frames de animação do Vaguetti (sprites 1-6 são animação, sprite 7 é default)
+        this.load.image('vaguetti_frame_0', './assets/Vaguetti/sprite_vaguettev2_fundoremovido1.png');
+        this.load.image('vaguetti_frame_1', './assets/Vaguetti/sprite_vaguettev2_fundoremovido2.png');
+        this.load.image('vaguetti_frame_2', './assets/Vaguetti/sprite_vaguettev2_fundoremovido3.png');
+        this.load.image('vaguetti_frame_3', './assets/Vaguetti/sprite_vaguettev2_fundoremovido4.png');
+        this.load.image('vaguetti_frame_4', './assets/Vaguetti/sprite_vaguettev2_fundoremovido5.png');
+        this.load.image('vaguetti_frame_5', './assets/Vaguetti/sprite_vaguettev2_fundoremovido6.png');
+        
+        // Imagem estática para fallback (sprite 7 é o default)
+        this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
+
+        // Monstros principais:
+        // skeleton-walk é sprite sheet 192x48 (4 frames 48x48)
+        this.load.spritesheet('enemy_light_tex', './assets/skeleton-walk.png', {
+            frameWidth: 48,
+            frameHeight: 48
+        });
+
+        // sprite_transparente.gif é gif animado (armazenado como imagem estática em alguns casos)
+        this.load.image('enemy_shadow_tex', './assets/sprite_transparente.gif');
+
+        // Assets gerais de fase
+        this.load.image('bg_dark_forest', './assets/forest/vegetation/dark%20forest.png');
+        this.load.image('moto_foda', './assets/moto_foda.png');
+
+        // Árvores animadas do Lost Pixel Art
+        this.load.image('tree_1_1', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 1.png');
+        this.load.image('tree_1_2', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 2.png');
+        this.load.image('tree_1_3', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 3.png');
+        this.load.image('tree_1_4', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 4.png');
+        
+        this.load.image('tree_2_1', './assets/Lost Pixel Art - Forest/Trees/Tree_2 - 1.png');
+        this.load.image('tree_2_2', './assets/Lost Pixel Art - Forest/Trees/Tree_2 - 2.png');
+        this.load.image('tree_2_3', './assets/Lost Pixel Art - Forest/Trees/Tree_2 - 3.png');
+        this.load.image('tree_2_4', './assets/Lost Pixel Art - Forest/Trees/Tree_2 - 4.png');
+
+        // Flores animadas
+        this.load.image('flower_1_1', './assets/Flowers/Flower_1 - 1.png');
+        this.load.image('flower_1_2', './assets/Flowers/Flower_1 - 2.png');
+        this.load.image('flower_1_3', './assets/Flowers/Flower_1 - 3.png');
+        this.load.image('flower_1_4', './assets/Flowers/Flower_1 - 4.png');
+
+        this.load.image('flower_2_1', './assets/Flowers/Flower_2 - 1.png');
+        this.load.image('flower_2_2', './assets/Flowers/Flower_2 - 2.png');
+        this.load.image('flower_2_3', './assets/Flowers/Flower_2 - 3.png');
+        this.load.image('flower_2_4', './assets/Flowers/Flower_2 - 4.png');
+
+        this.load.image('flower_3_1', './assets/Flowers/Flower_3 - 1.png');
+        this.load.image('flower_3_2', './assets/Flowers/Flower_3 - 2.png');
+        this.load.image('flower_3_3', './assets/Flowers/Flower_3 - 3.png');
+        this.load.image('flower_3_4', './assets/Flowers/Flower_3 - 4.png');
+
+        this.load.image('flower_4_1', './assets/Flowers/Flower_4 - 1.png');
+        this.load.image('flower_4_2', './assets/Flowers/Flower_4 - 2.png');
+        this.load.image('flower_4_3', './assets/Flowers/Flower_4 - 3.png');
+        this.load.image('flower_4_4', './assets/Flowers/Flower_4 - 4.png');
+
+        // Arbustos
+        this.load.image('bush_1', './assets/Bushes/Bush - 1.png');
+        this.load.image('bush_2', './assets/Bushes/Bush - 2.png');
+
+        // Grama animada
+        this.load.image('grass_1', './assets/Grass/Grass - 1.png');
+        this.load.image('grass_2', './assets/Grass/Grass - 2.png');
+        this.load.image('grass_3', './assets/Grass/Grass - 3.png');
+        this.load.image('grass_4', './assets/Grass/Grass - 4.png');
+
+        // Assets para FishingScene
+        this.load.image('fishing_scene', './assets/fishing-scene.png');
+
+        // Assets para IntroScene
+        this.load.image('estrada_pixel_art', './assets/estrada_pixel_art.png');
+        this.load.image('First_scene', './assets/First-scene.png');
+
+        // Assets para Level1_Arrival
+        this.load.image('clean_florest', './assets/clean_florest.png');
+        this.load.image('forest_trees', './assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
+
+        // Assets para Level4_Camp
+        this.load.image('querosene', './assets/querosene.png');
+
+        // Assets para Level5_DarkForest e outras cenas
+        this.load.image('dark_forest', './assets/dark_forest.png');
+
+        // Assets para Level6_Road
+        this.load.image('road_bg', './assets/road_bg.png');
+
+        this.load.on('loaderror', (file) => {
+            if (file.key === 'enemy_light_tex' || file.key === 'enemy_shadow_tex') {
+                console.warn('Falha no carregamento de', file.key, '-> fallback placeholder será usado.');
+            }
+        });
     }
 
     create() {
@@ -72,16 +163,16 @@ export default class BootScene extends Phaser.Scene {
 
         // Interatividade - teclado
         this.input.keyboard.once('keydown-ENTER', () => {
-            this.goToMenu();
+            this.startIntro();
         });
 
         // Interatividade - mouse
         this.input.once('pointerdown', () => {
-            this.goToMenu();
+            this.startIntro();
         });
     }
 
-    goToMenu() {
+    startIntro() {
         // Verifica se já está em tela cheia; se não estiver, solicita a entrada.
         if (!this.scale.isFullscreen) {
             this.scale.startFullscreen();
@@ -90,7 +181,7 @@ export default class BootScene extends Phaser.Scene {
         // Continua a transição de cena normalmente
         this.cameras.main.fade(300, 0, 0, 0);
         this.time.delayedCall(300, () => {
-            this.scene.start('MenuScene');
+            this.scene.start('IntroScene');
         });
     }
 
@@ -109,28 +200,143 @@ export default class BootScene extends Phaser.Scene {
         ctx.fillRect(0, 0, size, size);
         canvas.refresh();
 
-        // Textura do Inimigo de Luz (Branco/Pálido com aura)
-        const enemySize = 64;
-        const eLightCanvas = this.textures.createCanvas('enemy_light_tex', enemySize, enemySize);
-        const elCtx = eLightCanvas.getContext();
-        elCtx.fillStyle = '#ffffff';
-        elCtx.beginPath();
-        elCtx.moveTo(32, 10); elCtx.lineTo(50, 54); elCtx.lineTo(14, 54); elCtx.closePath();
-        elCtx.fill();
-        elCtx.fillStyle = '#ff0000'; elCtx.fillRect(25, 25, 4, 4); elCtx.fillRect(35, 25, 4, 4);
-        eLightCanvas.refresh();
+        // Criar spritesheet do Vaguetti combinando os frames de animação
+        if (!this.anims.exists('vaguetti_walk')) {
+            this.anims.create({
+                key: 'vaguetti_walk',
+                frames: [
+                    { key: 'vaguetti_frame_0', frame: 0 },
+                    { key: 'vaguetti_frame_1', frame: 0 },
+                    { key: 'vaguetti_frame_2', frame: 0 },
+                    { key: 'vaguetti_frame_3', frame: 0 },
+                    { key: 'vaguetti_frame_4', frame: 0 },
+                    { key: 'vaguetti_frame_5', frame: 0 }
+                ],
+                frameRate: 10,
+                repeat: -1
+            });
+        }
 
-        // Textura do Inimigo de Sombra (Escuro/Espectral)
-        const eShadowCanvas = this.textures.createCanvas('enemy_shadow_tex', enemySize, enemySize);
-        const esCtx = eShadowCanvas.getContext();
-        esCtx.fillStyle = '#111111';
-        esCtx.beginPath();
-        esCtx.arc(32, 32, 20, 0, Math.PI * 2);
-        esCtx.fill();
-        esCtx.fillStyle = '#ff00ff'; 
-        esCtx.fillRect(25, 30, 3, 3); 
-        esCtx.fillRect(39, 30, 3, 3);
-        eShadowCanvas.refresh();
+        // Criar animações globais para inimigos
+        if (!this.anims.exists('enemy_light_walk')) {
+            this.anims.create({
+                key: 'enemy_light_walk',
+                frames: this.anims.generateFrameNumbers('enemy_light_tex', { start: 0, end: 3 }),
+                frameRate: 8,
+                repeat: -1
+            });
+        }
+
+        if (!this.anims.exists('enemy_shadow_idle')) {
+            // Caso o GIF de sombra não seja animado em Phaser, mantém um frame estático.
+            this.anims.create({
+                key: 'enemy_shadow_idle',
+                frames: [{ key: 'enemy_shadow_tex', frame: null }],
+                frameRate: 1,
+                repeat: -1
+            });
+        }
+
+        // Animações das árvores
+        if (!this.anims.exists('tree_1_sway')) {
+            this.anims.create({
+                key: 'tree_1_sway',
+                frames: [
+                    { key: 'tree_1_1', frame: 0 },
+                    { key: 'tree_1_2', frame: 0 },
+                    { key: 'tree_1_3', frame: 0 },
+                    { key: 'tree_1_4', frame: 0 }
+                ],
+                frameRate: 3,
+                repeat: -1
+            });
+        }
+
+        if (!this.anims.exists('tree_2_sway')) {
+            this.anims.create({
+                key: 'tree_2_sway',
+                frames: [
+                    { key: 'tree_2_1', frame: 0 },
+                    { key: 'tree_2_2', frame: 0 },
+                    { key: 'tree_2_3', frame: 0 },
+                    { key: 'tree_2_4', frame: 0 }
+                ],
+                frameRate: 3,
+                repeat: -1
+            });
+        }
+
+        // Animações das flores
+        if (!this.anims.exists('flower_1_bloom')) {
+            this.anims.create({
+                key: 'flower_1_bloom',
+                frames: [
+                    { key: 'flower_1_1', frame: 0 },
+                    { key: 'flower_1_2', frame: 0 },
+                    { key: 'flower_1_3', frame: 0 },
+                    { key: 'flower_1_4', frame: 0 }
+                ],
+                frameRate: 4,
+                repeat: -1
+            });
+        }
+
+        if (!this.anims.exists('flower_2_bloom')) {
+            this.anims.create({
+                key: 'flower_2_bloom',
+                frames: [
+                    { key: 'flower_2_1', frame: 0 },
+                    { key: 'flower_2_2', frame: 0 },
+                    { key: 'flower_2_3', frame: 0 },
+                    { key: 'flower_2_4', frame: 0 }
+                ],
+                frameRate: 4,
+                repeat: -1
+            });
+        }
+
+        if (!this.anims.exists('flower_3_bloom')) {
+            this.anims.create({
+                key: 'flower_3_bloom',
+                frames: [
+                    { key: 'flower_3_1', frame: 0 },
+                    { key: 'flower_3_2', frame: 0 },
+                    { key: 'flower_3_3', frame: 0 },
+                    { key: 'flower_3_4', frame: 0 }
+                ],
+                frameRate: 4,
+                repeat: -1
+            });
+        }
+
+        if (!this.anims.exists('flower_4_bloom')) {
+            this.anims.create({
+                key: 'flower_4_bloom',
+                frames: [
+                    { key: 'flower_4_1', frame: 0 },
+                    { key: 'flower_4_2', frame: 0 },
+                    { key: 'flower_4_3', frame: 0 },
+                    { key: 'flower_4_4', frame: 0 }
+                ],
+                frameRate: 4,
+                repeat: -1
+            });
+        }
+
+        // Animações da grama
+        if (!this.anims.exists('grass_sway')) {
+            this.anims.create({
+                key: 'grass_sway',
+                frames: [
+                    { key: 'grass_1', frame: 0 },
+                    { key: 'grass_2', frame: 0 },
+                    { key: 'grass_3', frame: 0 },
+                    { key: 'grass_4', frame: 0 }
+                ],
+                frameRate: 5,
+                repeat: -1
+            });
+        }
 
         // Textura do feixe de luz (Ataque)
         const beamW = 400;
