@@ -10,7 +10,9 @@ export default class Level4_Camp extends Phaser.Scene {
     }
 
     preload() {
-        // Assets já são carregados em BootScene - não duplicar aqui
+        this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
+        this.load.image('bg_dark_forest', './assets/dark_forest.png');
+        this.load.image('querosene', './assets/querosene.png');
     }
 
     create() {
@@ -22,7 +24,7 @@ export default class Level4_Camp extends Phaser.Scene {
         const h = worldHeight;
 
         // Fundo do level (dark forest) - visível ao fundo
-        this.add.image(0, 0, 'dark_forest').setOrigin(0, 0).setDisplaySize(w, h).setDepth(-1);
+        this.add.image(0, 0, 'bg_dark_forest').setOrigin(0, 0).setDisplaySize(w, h).setDepth(-1);
 
         // Overlay escuro semitransparente para criar atmosfera noturna
         const darkOverlay = this.add.graphics();
@@ -33,7 +35,7 @@ export default class Level4_Camp extends Phaser.Scene {
 
         // Player
         this.player = new Player(this, w * 0.2, h * 0.7);
-        const vaguettiScale = Math.min(h / 600, 1) * 1.0;
+        const vaguettiScale = Math.min(h / 600, 1) * 0.7;
         this.player.setScale(vaguettiScale);
         this.player.setDepth(10);
         this.player.light.setDepth(101);
@@ -170,10 +172,6 @@ export default class Level4_Camp extends Phaser.Scene {
         
         // Inimigo de sombra só causa dano se a luz estiver desligada
         if (enemy.type === 'shadow' && this.player.isLightOn) {
-            return; // Não causa dano
-        }
-        // Inimigo de luz só causa dano se a luz estiver ligada
-        if (enemy.type === 'light' && !this.player.isLightOn) {
             return; // Não causa dano
         }
         this.player.takeDamage(20);

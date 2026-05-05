@@ -38,9 +38,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         
         // Armazenar a posição Y original para correto posicionamento da luz
         this.baseY = y;
-        // Offsets para o lampião - ajustado para posição na cabeça do personagem
-        this.lightYOffset = -250; // Para cima
-        this.lightXOffset = 60;   // Para frente
+        // Offsets para o lampião - calibrado para escala 0.7
+        this.lightYOffset = -260; // Para cima
+        this.lightXOffset = 50;   // Para frente
         
         // Luz do Lampião (Cor âmbar/quente)
         this.lightRadius = 200;
@@ -192,30 +192,49 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (!this.active) return;
 
         this.fuelBar.clear();
-
-        const offsetY = 120; // AJUSTE AQUI
-
-        const barX = this.x - 30;
-        const barY = this.y - offsetY;
-
-        // Fundo
-        this.fuelBar.fillStyle(0x000000, 0.5);
-        this.fuelBar.fillRect(barX, barY, 60, 14);
-
-        // Vida
+        
+        // Posição da barra ajustada para escala
+        const barOffsetY = -180;
+        const barWidth = 80;
+        const barHeight = 12;
+        const barX = this.x - 40;
+        const barY = this.y + barOffsetY;
+        
+        // Borda externa (moldura)
+        this.fuelBar.lineStyle(2, 0x000000, 0.8);
+        this.fuelBar.strokeRect(barX, barY, barWidth, barHeight);
+        
+        // Fundo das barras (mais escuro)
+        this.fuelBar.fillStyle(0x1a1a1a, 0.8);
+        this.fuelBar.fillRect(barX, barY, barWidth, barHeight);
+        
+        // Barra de Vida (Verde brilhante)
         const healthPercent = Math.max(0, this.health / this.maxHealth);
         this.fuelBar.fillStyle(0x00ff00, 1);
-        this.fuelBar.fillRect(barX, barY, 60 * healthPercent, 6);
+        this.fuelBar.fillRect(barX + 2, barY + 2, (barWidth - 4) * healthPercent, (barHeight / 2) - 2);
+        
+        // Borda interna da barra de vida
+        this.fuelBar.lineStyle(1, 0x008800, 0.6);
+        this.fuelBar.strokeRect(barX + 2, barY + 2, (barWidth - 4) * healthPercent, (barHeight / 2) - 2);
 
-        // Combustível
+        // Barra de Combustível (Ciano/Cinza/Vermelho com gradiente de cor)
         const fuelPercent = Math.max(0, this.fuel / this.maxFuel);
-        const fuelColor =
-            this.fuel > 20
-                ? (this.isLightOn ? 0x00ffff : 0x777777)
-                : 0xff0000;
-
+        let fuelColor;
+        
+        if (fuelPercent > 0.5) {
+            fuelColor = 0x00ffff; // Ciano - bom
+        } else if (fuelPercent > 0.2) {
+            fuelColor = 0xffaa00; // Laranja - cuidado
+        } else {
+            fuelColor = 0xff0000; // Vermelho - crítico
+        }
+        
         this.fuelBar.fillStyle(fuelColor, 1);
-        this.fuelBar.fillRect(barX, barY + 8, 60 * fuelPercent, 6);
+        this.fuelBar.fillRect(barX + 2, barY + (barHeight / 2), (barWidth - 4) * fuelPercent, (barHeight / 2) - 2);
+        
+        // Borda interna da barra de combustível
+        this.fuelBar.lineStyle(1, 0x008888, 0.6);
+        this.fuelBar.strokeRect(barX + 2, barY + (barHeight / 2), (barWidth - 4) * fuelPercent, (barHeight / 2) - 2);
     }
 
     takeDamage(amount) {

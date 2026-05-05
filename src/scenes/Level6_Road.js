@@ -10,7 +10,9 @@ export default class Level6_Road extends Phaser.Scene {
     }
 
     preload() {
-        // Assets já são carregados em BootScene - não duplicar aqui
+        this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
+        this.load.image('road', './assets/road.png');
+        this.load.image('moto', './assets/moto_foda.png');
     }
 
     create() {
@@ -22,14 +24,17 @@ export default class Level6_Road extends Phaser.Scene {
         const worldHeight = h;
         this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
 
-        // Fundo: Estrada (usando road_bg.png repetida horizontalmente)
-        this.add.tileSprite(0, 0, worldWidth, worldHeight, 'road_bg')
-            .setOrigin(0, 0)
-            .setDepth(-1);
+        // Fundo: Road repetido 5 vezes
+        for (let i = 0; i < 5; i++) {
+            this.add.image(i * w, 0, 'road')
+                .setOrigin(0, 0)
+                .setDisplaySize(w, h)
+                .setDepth(-1);
+        }
 
         // Player
         this.player = new Player(this, 150, h * 0.7);
-        const vaguettiScale = Math.min(h / 600, 1);
+        const vaguettiScale = Math.min(h / 600, 1) * 0.7;
         this.player.setScale(vaguettiScale);
         this.player.setDepth(10);
         this.player.light.setDepth(101);
@@ -42,8 +47,8 @@ export default class Level6_Road extends Phaser.Scene {
 
         // A Moto (Objetivo Final) - no final da estrada
         this.motoContainer = this.add.container(worldWidth * 0.75, h * 0.7);
-        const motoImg = this.add.image(0, 0, 'moto_foda');
-        motoImg.setScale(1.2);
+        const motoImg = this.add.image(0, 0, 'moto');
+        motoImg.setScale(0.8);
         this.motoContainer.add(motoImg);
         this.physics.add.existing(this.motoContainer, true);
         this.motoContainer.setDepth(15);
@@ -64,6 +69,21 @@ export default class Level6_Road extends Phaser.Scene {
         });
 
         this.physics.add.overlap(this.player, this.enemies, (p, e) => this.handlePlayerDamage(e));
+
+        // UI
+        const titleSize = Math.max(24, w / 25);
+        this.add.text(w * 0.5, h * 0.1, 'A ESTRADA DE FUGA', {
+            fontFamily: 'Arial, sans-serif',
+            fontSize: titleSize + 'px',
+            color: '#FF6B00',
+            fontStyle: 'bold'
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(200);
+
+        this.add.text(w * 0.5, h * 0.18, 'Corra para a moto! Inimigos se aproximam!', {
+            fontFamily: 'Arial, sans-serif',
+            fontSize: '18px',
+            color: '#FF4444'
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(200);
 
         // Lógica de Vitória
         this.physics.add.overlap(this.player, this.motoContainer, () => {
@@ -144,7 +164,7 @@ export default class Level6_Road extends Phaser.Scene {
             case 'bottom':
                 // De baixo
                 spawnX = this.player.x - 300 + Math.random() * 600;
-                spawnY = h;
+                spawnY = h * 1.0;
                 break;
         }
 
@@ -182,68 +202,16 @@ export default class Level6_Road extends Phaser.Scene {
             ease: 'Linear'
         });
 
-        this.time.delayedCall(3000, () => {
-            this.showVictoryScreen();
-        });
-    }
-
-    showVictoryScreen() {
-        const w = this.scale.width;
-        const h = this.scale.height;
-
-        // Criar overlay preto para cobrir tudo
-        const overlay = this.add.graphics();
-        overlay.fillStyle(0x000000, 1);
-        overlay.fillRect(0, 0, w, h);
-        overlay.setDepth(999); // Muito alto para cobrir tudo
-
-        // Fade in do overlay
-        overlay.setAlpha(0);
-        this.tweens.add({
-            targets: overlay,
-            alpha: 1,
-            duration: 1500,
-            onComplete: () => {
-                // Após o fade, adicionar elementos de vitória
-                this.addVictoryElements(w, h);
-            }
-        });
-    }
-
-    addVictoryElements(w, h) {
-        // Texto de vitória
-        const victoryText = this.add.text(w / 2, h * 0.3, 'VITÓRIA!', {
-            fontSize: '80px',
-            color: '#FFD700',
+        this.add.text(w * 0.5, h * 0.5, 'VOCÊ ESCAPOU!', {
+            fontFamily: 'Arial, sans-serif',
+            fontSize: '64px',
+            color: '#00FF00',
             fontStyle: 'bold'
-        }).setOrigin(0.5).setDepth(1000);
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(200);
 
-        // Texto descritivo
-        const descText = this.add.text(w / 2, h * 0.5,
-            'Vaguetti escapou da floresta de Valdelobos!\nSobreviveu à noite e alcançou sua moto.', {
-            fontSize: '24px',
-            color: '#FFFFFF',
-            align: 'center',
-            backgroundColor: '#00000088',
-            padding: { x: 20, y: 10 }
-        }).setOrigin(0.5).setDepth(1000);
-
-        // Texto de instrução
-        const instructionText = this.add.text(w / 2, h * 0.8, 'Pressione ENTER ou CLIQUE para encerrar', {
-            fontSize: '18px',
-            color: '#CCCCCC'
-        }).setOrigin(0.5).setDepth(1000);
-
-        // Controles para encerrar
-        this.input.keyboard.once('keydown-ENTER', () => {
-            window.location.reload();
+        this.time.delayedCall(3000, () => {
+            this.scene.start('MenuScene');
         });
-
-        this.input.once('pointerdown', () => {
-            window.location.reload();
-        });
-
-        console.log('Victory screen elements added');
     }
 
     handlePlayerDamage(enemy) {
@@ -256,10 +224,6 @@ export default class Level6_Road extends Phaser.Scene {
         
         // Inimigo de sombra só causa dano se a luz estiver desligada
         if (enemy.type === 'shadow' && this.player.isLightOn) {
-            return; // Não causa dano
-        }
-        // Inimigo de luz só causa dano se a luz estiver ligada
-        if (enemy.type === 'light' && !this.player.isLightOn) {
             return; // Não causa dano
         }
         this.player.takeDamage(25);

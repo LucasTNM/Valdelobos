@@ -10,8 +10,11 @@ export default class Level1_Arrival extends Phaser.Scene {
     }
 
    preload() {
-        // Assets já são carregados em BootScene - não duplicar aqui
-    }
+    this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
+    this.load.image('forest_trees', './assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
+    this.load.image('clean_florest', './assets/clean_florest.png');
+    this.load.image('moto_foda', './assets/moto_foda.png');
+}
 
     create() {
         // Redefinir limites do mundo para permitir exploração horizontal
@@ -276,10 +279,6 @@ export default class Level1_Arrival extends Phaser.Scene {
         if (enemy.type === 'shadow' && this.player.isLightOn) {
             return; // Não causa dano
         }
-        // Inimigo de luz só causa dano se a luz estiver ligada
-        if (enemy.type === 'light' && !this.player.isLightOn) {
-            return; // Não causa dano
-        }
         this.player.takeDamage(10);
     }
 
@@ -382,7 +381,7 @@ export default class Level1_Arrival extends Phaser.Scene {
         // Fumaça saindo do lampião
         if (this.player && this.player.fuel > 0) {
             if (Math.random() > 0.8) {
-                const smoke = this.add.image(this.player.x, this.player.y - 40, 'smoke');
+                const smoke = this.add.image(this.player.x + this.player.lightXOffset, this.player.y + this.player.lightYOffset, 'smoke');
                 smoke.setDepth(101);
                 smoke.setAlpha(0.3);
                 smoke.setScale(0.5);

@@ -10,7 +10,8 @@ export default class Level6_Escape extends Phaser.Scene {
     }
 
     preload() {
-        // Assets já são carregados em BootScene - não duplicar aqui
+        this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
+        this.load.image('dark_forest', './assets/dark_forest.png');
     }
 
     create() {
@@ -87,10 +88,6 @@ export default class Level6_Escape extends Phaser.Scene {
         
         // Inimigo de sombra só causa dano se a luz estiver desligada
         if (enemy.type === 'shadow' && this.player.isLightOn) {
-            return; // Não causa dano
-        }
-        // Inimigo de luz só causa dano se a luz estiver ligada
-        if (enemy.type === 'light' && !this.player.isLightOn) {
             return; // Não causa dano
         }
         this.player.takeDamage(25);

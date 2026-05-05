@@ -7,54 +7,54 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
 
         this.type = type; // 'light' ou 'shadow'
-        this.setCollideWorldBounds(false);
-
+        this.setCollideWorldBounds(false); // Desativar colisão com bordas do mundo
         this.speed = type === 'light' ? 80 : 120;
         this.maxHealth = 60;
         this.health = 60;
 
-        // ATAQUE
-        this.attackRange = 60; // Reduzido de 100 para 60
-        this.attackCooldown = 800;
-        this.lastAttackTime = 0;
-
-        // Escala
+        // Ajustar escala baseando no tamanho do jogador para ficar equivalente
         if (scene.player && scene.player.height > 0 && this.height > 0) {
             const heroDisplayHeight = scene.player.height * scene.player.scaleY;
-            const targetHeight = heroDisplayHeight * 0.5;
+            const targetHeight = heroDisplayHeight * 0.5; // reduzido para 50% do herói
             const scale = targetHeight / this.height;
             this.setScale(scale);
         } else {
-            this.setScale(0.8);
+            this.setScale(0.8); // fallback menor também
         }
 
-        this.setOrigin(0.5, 1);
+        this.setOrigin(0.5, 1); // igual ao jogador para alinhamento de chão
 
-        // Hitbox centralizada e maior
+        // Collision body - Hitbox retangular que acompanha o sprite
         if (this.body) {
-            const bodyWidth = this.displayWidth * 0.6;
-            const bodyHeight = this.displayHeight * 0.7;
+            // Hitbox retangular generosa para melhor colisão
+            const bodyWidth = this.displayWidth * 0.7;
+            const bodyHeight = this.displayHeight * 0.75;
             const offsetX = (this.displayWidth - bodyWidth) / 2;
-            // Com origin (0.5, 1), o corpo físico começa do topo (y=0)
-            // então o offset vertical deve posicionar no corpo, não acima
-            const offsetY = this.displayHeight * 0.30; // 15% do topo = pula a cabeça
+            const offsetY = this.displayHeight - bodyHeight;
             this.body.setSize(bodyWidth, bodyHeight);
             this.body.setOffset(offsetX, offsetY);
         }
 
-        // Barra de vida
+        // Barra de vida do inimigo
         this.healthBar = scene.add.graphics();
         this.healthBar.setDepth(104);
         this.updateHealthBar();
 
+        // Estados: IDLE, CHASE, ATTACK
         this.state = 'IDLE';
         this.target = scene.player;
 
         if (this.type === 'light') {
             this.play('enemy_light_walk');
         } else {
+            // Dependendo do gif, o Phaser pode não animar automaticamente; mantenha o frame
             this.play('enemy_shadow_idle');
         }
+
+        // Não tint para sprites detalhadas. Mantém original dos PNGs.
+        // Se quiser depuração de tipo, ative o tint abaixo:
+        // this.tintValue = type === 'light' ? 0xffaaaa : 0x5555ff;
+        // this.setTint(this.tintValue);
     }
 
     update() {
@@ -81,8 +81,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             // Sombra age no escuro
             if (!playerIsVisible && distance < 800) {
                 this.state = 'CHASE';
-            } else if (playerIsVisible && distance < 200) {
-                // Foge da luz
+            } else if (playerIsVisible && distance < 100) {
+                // Se o player ligar a luz muito próxima, ele recua (distância reduzida)
                 this.state = 'IDLE';
                 const angle = Phaser.Math.Angle.Between(
                     this.target.x, this.target.y,
@@ -131,6 +131,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         if (this.target.isAttacking) {
             this.checkBeamHit();
         }
+
+        // Checar se está dentro da área de luz da lanterna
+        if (this.target.isLightOn && this.target.fuel > 0) {
+            this.checkLanternLight();
+        }
     }
 
     tryAttack() {
@@ -175,6 +180,16 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             if (dist < 400) {
                 this.takeDamage(2);
             }
+        }
+    }
+
+    checkLanternLight() {
+        const player = this.target;
+        const dist = Phaser.Math.Distance.Between(player.x + player.lightXOffset, player.y + player.lightYOffset, this.x, this.y);
+        
+        // Se estiver dentro do raio de luz da lanterna
+        if (dist < player.lightRadius) {
+            this.takeDamage(1); // Dano contínuo menor da luz ambiente
         }
     }
 

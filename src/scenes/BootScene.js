@@ -76,26 +76,6 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('grass_3', './assets/Grass/Grass - 3.png');
         this.load.image('grass_4', './assets/Grass/Grass - 4.png');
 
-        // Assets para FishingScene
-        this.load.image('fishing_scene', './assets/fishing-scene.png');
-
-        // Assets para IntroScene
-        this.load.image('estrada_pixel_art', './assets/estrada_pixel_art.png');
-        this.load.image('First_scene', './assets/First-scene.png');
-
-        // Assets para Level1_Arrival
-        this.load.image('clean_florest', './assets/clean_florest.png');
-        this.load.image('forest_trees', './assets/ForestVegetation/forest_tiles_trees_with_shadows.png');
-
-        // Assets para Level4_Camp
-        this.load.image('querosene', './assets/querosene.png');
-
-        // Assets para Level5_DarkForest e outras cenas
-        this.load.image('dark_forest', './assets/dark_forest.png');
-
-        // Assets para Level6_Road
-        this.load.image('road_bg', './assets/road_bg.png');
-
         this.load.on('loaderror', (file) => {
             if (file.key === 'enemy_light_tex' || file.key === 'enemy_shadow_tex') {
                 console.warn('Falha no carregamento de', file.key, '-> fallback placeholder será usado.');
