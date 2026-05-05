@@ -24,51 +24,21 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         this.setOrigin(0.5, 1); // igual ao jogador para alinhamento de chão
 
-        // Collision body - Hitbox separada por tipo de inimigo
+        // Collision body - Hitbox retangular que acompanha o sprite
         if (this.body) {
-            // Configurações de hitbox específicas para cada tipo
-            const hitboxSettings = {
-                light: {
-                    widthScale: 0.1,
-                    heightScale: 0.2,
-                    offsetXAdjustment: -100,
-                    offsetYAdjustment: -175
-                },
-                shadow: {
-                    widthScale: 0.35,
-                    heightScale: 0.75,
-                    offsetXAdjustment: -8,
-                    offsetYAdjustment: -10
-                }
-            };
-
-            const { widthScale, heightScale, offsetXAdjustment, offsetYAdjustment } = hitboxSettings[this.type] || hitboxSettings.shadow;
-            const bodyWidth = this.displayWidth * widthScale;
-            const bodyHeight = this.displayHeight * heightScale;
-            const offsetX = (this.displayWidth - bodyWidth) / 2 + offsetXAdjustment;
-            const offsetY = this.displayHeight - bodyHeight + offsetYAdjustment;
-
+            // Hitbox retangular generosa para melhor colisão
+            const bodyWidth = this.displayWidth * 0.7;
+            const bodyHeight = this.displayHeight * 0.75;
+            const offsetX = (this.displayWidth - bodyWidth) / 2;
+            const offsetY = this.displayHeight - bodyHeight;
             this.body.setSize(bodyWidth, bodyHeight);
             this.body.setOffset(offsetX, offsetY);
-
-            // Ajuste esses valores para calibrar o hitbox de cada inimigo:
-            // - light.widthScale / light.heightScale / light.offsetXAdjustment / light.offsetYAdjustment
-            // - shadow.widthScale / shadow.heightScale / shadow.offsetXAdjustment / shadow.offsetYAdjustment
         }
 
         // Barra de vida do inimigo
         this.healthBar = scene.add.graphics();
         this.healthBar.setDepth(104);
         this.updateHealthBar();
-
-        // Debug visual de colisões
-        this.debugBody = scene.add.graphics();
-        this.debugBody.setDepth(1000);
-        this.on('destroy', () => {
-            if (this.debugBody) {
-                this.debugBody.destroy();
-            }
-        });
 
         // Estados: IDLE, CHASE, ATTACK
         this.state = 'IDLE';
@@ -157,7 +127,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         }
 
         this.updateHealthBar();
-        this.updateDebugGraphic();
 
         if (this.target.isAttacking) {
             this.checkBeamHit();
@@ -237,22 +206,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         this.healthBar.fillStyle(barColor, 1);
         this.healthBar.fillRect(this.x - 20, this.y - 70, 40 * healthPercent, 6);
-    }
-
-    updateDebugGraphic() {
-        if (!this.debugBody) return;
-
-        if (this.scene.game.debugMode) {
-            this.debugBody.visible = true;
-            this.debugBody.clear();
-            this.debugBody.lineStyle(2, 0xff00ff, 1);
-            if (this.body) {
-                this.debugBody.strokeRect(this.body.x, this.body.y, this.body.width, this.body.height);
-            }
-        } else {
-            this.debugBody.clear();
-            this.debugBody.visible = false;
-        }
     }
 
     takeDamage(amount) {

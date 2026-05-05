@@ -31,7 +31,6 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('enemy_shadow_tex', './assets/sprite_transparente.gif');
 
         // Assets gerais de fase
-        this.load.image('estrada_pixel_art', './assets/estrada_pixel_art.png');
         this.load.image('bg_dark_forest', './assets/forest/vegetation/dark%20forest.png');
         this.load.image('moto_foda', './assets/moto_foda.png');
 
@@ -162,7 +161,7 @@ export default class BootScene extends Phaser.Scene {
         // Continua a transição de cena normalmente
         this.cameras.main.fade(300, 0, 0, 0);
         this.time.delayedCall(300, () => {
-            this.scene.start('MenuScene');
+            this.scene.start('IntroScene');
         });
     }
 
