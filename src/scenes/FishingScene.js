@@ -33,9 +33,8 @@ export default class FishingScene extends Phaser.Scene {
 
         // Criar o Player
         this.player = new Player(this, screenWidth * 0.75, screenHeight * 0.25);
-        const vaguettiScale = 0.35; // Escala bem reduzida
+        const vaguettiScale = Math.min(screenHeight / 600, 1) * 0.7;
         this.player.setScale(vaguettiScale);
-        this.player.body.setSize(this.player.body.width * 0.6, this.player.body.height * 0.6); // Hitbox reduzida
         this.player.setDepth(10);
         this.player.light.setDepth(11).setScale(vaguettiScale);
         this.player.beam.setDepth(12);
@@ -45,15 +44,7 @@ export default class FishingScene extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, screenWidth, screenHeight);
 
         // UI - Instruções
-        const titleSize = Math.max(24, this.scale.width / 25);
-        this.add.text(this.scale.width * 0.5, this.scale.height * 0.05, 'Pesca Noturna', {
-            fontFamily: 'Arial, sans-serif',
-            fontSize: titleSize + 'px',
-            color: '#FFD700',
-            fontStyle: 'bold',
-            backgroundColor: '#00000088',
-            padding: { x: 10, y: 5 }
-        }).setOrigin(0.5).setScrollFactor(0).setDepth(200);
+       
 
         this.add.text(this.scale.width * 0.5, this.scale.height * 0.12, 'Explore o mapa livremente | ENTER para continuar', {
             fontFamily: 'Arial, sans-serif',

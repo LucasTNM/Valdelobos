@@ -381,7 +381,7 @@ export default class Level1_Arrival extends Phaser.Scene {
         // Fumaça saindo do lampião
         if (this.player && this.player.fuel > 0) {
             if (Math.random() > 0.8) {
-                const smoke = this.add.image(this.player.x, this.player.y - 40, 'smoke');
+                const smoke = this.add.image(this.player.x + this.player.lightXOffset, this.player.y + this.player.lightYOffset, 'smoke');
                 smoke.setDepth(101);
                 smoke.setAlpha(0.3);
                 smoke.setScale(0.5);

@@ -24,13 +24,13 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         this.setOrigin(0.5, 1); // igual ao jogador para alinhamento de chão
 
-        // Collision body - MUITO MENOR e mais preciso
+        // Collision body - Hitbox retangular que acompanha o sprite
         if (this.body) {
-            // Hitbox minúscula - apenas o core do corpo
-            const bodyWidth = this.displayWidth * 0.35;
-            const bodyHeight = this.displayHeight * 0.45;
+            // Hitbox retangular generosa para melhor colisão
+            const bodyWidth = this.displayWidth * 0.7;
+            const bodyHeight = this.displayHeight * 0.75;
             const offsetX = (this.displayWidth - bodyWidth) / 2;
-            const offsetY = (this.displayHeight - bodyHeight);
+            const offsetY = this.displayHeight - bodyHeight;
             this.body.setSize(bodyWidth, bodyHeight);
             this.body.setOffset(offsetX, offsetY);
         }
@@ -74,8 +74,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             // Monstro da Escuridão: Caçador das sombras
             if (!playerIsVisible && distance < 800) {
                 this.state = 'CHASE';
-            } else if (playerIsVisible && distance < 200) {
-                // Se o player ligar a luz na cara dele, ele recua
+            } else if (playerIsVisible && distance < 100) {
+                // Se o player ligar a luz muito próxima, ele recua (distância reduzida)
                 this.state = 'IDLE';
                 const angle = Phaser.Math.Angle.Between(this.target.x, this.target.y, this.x, this.y);
                 this.setVelocity(Math.cos(angle) * this.speed, Math.sin(angle) * this.speed);
@@ -103,6 +103,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         if (this.target.isAttacking) {
             this.checkBeamHit();
         }
+
+        // Checar se está dentro da área de luz da lanterna
+        if (this.target.isLightOn && this.target.fuel > 0) {
+            this.checkLanternLight();
+        }
     }
 
     checkBeamHit() {
@@ -119,6 +124,16 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             if (dist < 400) {
                 this.takeDamage(2); // Dano contínuo duplicado (mais forte)
             }
+        }
+    }
+
+    checkLanternLight() {
+        const player = this.target;
+        const dist = Phaser.Math.Distance.Between(player.x + player.lightXOffset, player.y + player.lightYOffset, this.x, this.y);
+        
+        // Se estiver dentro do raio de luz da lanterna
+        if (dist < player.lightRadius) {
+            this.takeDamage(1); // Dano contínuo menor da luz ambiente
         }
     }
 
