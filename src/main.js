@@ -8,6 +8,7 @@ import Level5_DarkForest from './scenes/Level5_DarkForest';
 import Level6_Road from './scenes/Level6_Road';
 import Level6_Escape from './scenes/level6_Escape';
 import GameOver from './scenes/GameOver';
+import IntroScene from './scenes/IntroScene';
 
 const config = {
     type: Phaser.AUTO,
@@ -30,6 +31,7 @@ const config = {
     },
     scene: [
         BootScene,
+        IntroScene,
         MenuScene,
         FishingScene,
         Level1_Arrival,

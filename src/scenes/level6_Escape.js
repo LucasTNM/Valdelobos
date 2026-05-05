@@ -23,7 +23,7 @@ export default class Level6_Escape extends Phaser.Scene {
 
         // Player
         this.player = new Player(this, 100, h * 0.7);
-        const vaguettiScale = Math.min(h / 600, 1) * 0.7;
+        const vaguettiScale = Math.min(h / 600, 1) * 1.0;
         this.player.setScale(vaguettiScale);
         this.player.setDepth(10);
         this.player.light.setDepth(101);

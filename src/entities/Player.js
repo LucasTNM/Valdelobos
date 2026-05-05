@@ -24,8 +24,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.maxHealth = 100;
         this.health = 100;
         this.isInvincible = false;
-        this.fuelConsumptionRate = 1.5; // Por segundo (luz normal)
-        this.attackConsumptionRate = 10; // Extra por segundo ao atacar
+        this.fuelConsumptionRate = 3.0; // Aumentado de 1.5 para 3.0
+        this.attackConsumptionRate = 20; // Aumentado de 10 para 20
         this.isAttacking = false;
         this.isLightOn = false; // Novo estado: lampião ligado/desligado
         
@@ -242,6 +242,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     updateFuelBar() {
         if (!this.active) return;
+
         this.fuelBar.clear();
         
         // Posição da barra ajustada para escala

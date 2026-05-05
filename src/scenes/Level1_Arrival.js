@@ -61,7 +61,7 @@ export default class Level1_Arrival extends Phaser.Scene {
 
         // Personagem Vaguetti (Player)
         this.player = new Player(this, this.scale.width * 0.15, h * 0.65);
-        const vaguettiScale = Math.min(h / 600, 1) * 0.7;
+        const vaguettiScale = Math.min(h / 600, 1) * 1.0;
         this.player.setScale(vaguettiScale);
         this.player.setDepth(10);
         this.player.light.setDepth(101); // Acima da escuridão
@@ -398,4 +398,3 @@ export default class Level1_Arrival extends Phaser.Scene {
         }
     }
 }
-

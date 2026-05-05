@@ -143,16 +143,16 @@ export default class BootScene extends Phaser.Scene {
 
         // Interatividade - teclado
         this.input.keyboard.once('keydown-ENTER', () => {
-            this.goToMenu();
+            this.startIntro();
         });
 
         // Interatividade - mouse
         this.input.once('pointerdown', () => {
-            this.goToMenu();
+            this.startIntro();
         });
     }
 
-    goToMenu() {
+    startIntro() {
         // Verifica se já está em tela cheia; se não estiver, solicita a entrada.
         if (!this.scale.isFullscreen) {
             this.scale.startFullscreen();
@@ -161,7 +161,7 @@ export default class BootScene extends Phaser.Scene {
         // Continua a transição de cena normalmente
         this.cameras.main.fade(300, 0, 0, 0);
         this.time.delayedCall(300, () => {
-            this.scene.start('MenuScene');
+            this.scene.start('IntroScene');
         });
     }
 
