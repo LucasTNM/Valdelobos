@@ -8,6 +8,7 @@ export default class MenuScene extends Phaser.Scene {
         this.buttons = [];
         this.debugMode = false;
         this.debugMenuItems = [
+            { text: 'Intro', scene: 'IntroScene' },
             { text: 'Fishing', scene: 'Fishing' },
             { text: 'Chegada (Arrival)', scene: 'Level1_Arrival' },
             { text: 'Acampamento', scene: 'Level4_Camp' },
@@ -108,7 +109,7 @@ export default class MenuScene extends Phaser.Scene {
         this.clearMenuButtons();
 
         const baseMenuItems = [
-            { text: 'INICIAR JOGO', scene: 'Fishing' },
+            { text: 'INICIAR JOGO', scene: 'IntroScene' },
             { text: 'MODO DEBUG', scene: 'TOGGLE_DEBUG' },
             { text: 'SAIR', scene: null }
         ];
@@ -119,9 +120,17 @@ export default class MenuScene extends Phaser.Scene {
 
         const centerX = this.scale.width / 2;
         const centerY = this.scale.height / 2;
-        const startY = centerY * 0.7;
-        const spacing = Math.max(70, this.scale.height / 8);
-        const buttonScale = Math.max(0.8, this.scale.width / 1200);
+        
+        // Ajustar escala e espaçamento se estiver no modo debug
+        let buttonScale = Math.max(0.8, this.scale.width / 1200);
+        let spacing = Math.max(70, this.scale.height / 8);
+        let startY = centerY * 0.7;
+
+        if (this.debugMode) {
+            buttonScale *= 0.6; // Reduz a escala em 40%
+            spacing = Math.max(35, this.scale.height / 15); // Espaçamento bem menor
+            startY = centerY * 0.45; // Sobe o menu para dar mais espaço
+        }
 
         menuItems.forEach((item, index) => {
             const button = this.createButton(
