@@ -13,14 +13,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setOrigin(0.5, 1);
         
         // Ajustar hitbox do player para ser mais precisa
-        if (this.body) {
-            const bodyWidth = this.displayWidth * 0.35;
-            const bodyHeight = this.displayHeight * 0.45;
-            const offsetX = (this.displayWidth - bodyWidth) / 2;
-            const offsetY = (this.displayHeight - bodyHeight);
-            this.body.setSize(bodyWidth, bodyHeight);
-            this.body.setOffset(offsetX, offsetY);
-        }
+        this.updateCollisionBox();
         
         // Velocidade de movimento
         this.speed = 200;
@@ -62,6 +55,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Barra de combustível (UI simples que segue)
         this.fuelBar = scene.add.graphics();
         this.updateFuelBar();
+
+        // Debug visual de colisões
+        this.debugBody = scene.add.graphics();
+        this.debugBody.setDepth(1000);
+        this.on('destroy', () => {
+            if (this.debugBody) {
+                this.debugBody.destroy();
+            }
+        });
 
         // Teclas de controle
         this.cursors = scene.input.keyboard.createCursorKeys();
@@ -183,9 +185,59 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             );
         }
 
+        const scaledLightX = this.lightXOffset * this.scaleX;
+        const scaledLightY = this.lightYOffset * this.scaleY;
+
         // Atualizar posições dos efeitos
-        this.light.setPosition(this.x + this.lightXOffset, this.y + this.lightYOffset);
+        this.light.setPosition(this.x + scaledLightX, this.y + scaledLightY);
+        this.beam.setX(this.x + scaledLightX);
+        this.beam.setY(this.y + scaledLightY);
         this.updateFuelBar();
+        this.updateDebugGraphic();
+    }
+
+    updateDebugGraphic() {
+        if (!this.debugBody) return;
+
+        if (this.scene.game.debugMode) {
+            this.debugBody.visible = true;
+            this.debugBody.clear();
+            this.debugBody.lineStyle(2, 0x00ffff, 1);
+            if (this.body) {
+                this.debugBody.strokeRect(this.body.x, this.body.y, this.body.width, this.body.height);
+            }
+        } else {
+            this.debugBody.clear();
+            this.debugBody.visible = false;
+        }
+    }
+
+    updateCollisionBox() {
+        if (!this.body) return;
+
+        const bodyWidth = this.displayWidth * 0.4;
+        const bodyHeight = this.displayHeight/2;
+        const offsetX = (this.displayWidth - bodyWidth);
+        const offsetY = this.displayHeight - bodyHeight;
+
+        this.body.setSize(bodyWidth, bodyHeight);
+        this.body.setOffset(offsetX, offsetY);
+    }
+
+    updateVisualScale() {
+        if (this.light) {
+            this.light.setScale(this.scaleX);
+        }
+        if (this.beam) {
+            this.beam.setScale(this.scaleX);
+        }
+    }
+
+    setScale(x, y) {
+        const result = super.setScale(x, y);
+        this.updateCollisionBox();
+        this.updateVisualScale();
+        return result;
     }
 
     updateFuelBar() {
