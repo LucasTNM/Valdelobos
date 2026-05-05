@@ -6,6 +6,16 @@ export default class MenuScene extends Phaser.Scene {
         this.buttonHoverScale = 1.1;
         this.selectedIndex = 0;
         this.buttons = [];
+        this.debugMode = false;
+        this.debugMenuItems = [
+            { text: 'Fishing', scene: 'Fishing' },
+            { text: 'Chegada (Arrival)', scene: 'Level1_Arrival' },
+            { text: 'Acampamento', scene: 'Level4_Camp' },
+            { text: 'Floresta Escura', scene: 'Level5_DarkForest' },
+            { text: 'Estrada', scene: 'Level6_Road' },
+            { text: 'Fuga', scene: 'Level6_Escape' },
+            { text: 'Game Over', scene: 'GameOver' }
+        ];
     }
 
     create() {
@@ -18,7 +28,8 @@ export default class MenuScene extends Phaser.Scene {
         // Título do jogo com efeito de luz
         this.createTitle();
 
-        // Criar menu principal
+        // Criar painel de debug e menu principal
+        this.createDebugInfo();
         this.createMainMenu();
 
         // Interatividade com teclado
@@ -94,10 +105,17 @@ export default class MenuScene extends Phaser.Scene {
     }
 
     createMainMenu() {
-        const menuItems = [
+        this.clearMenuButtons();
+
+        const baseMenuItems = [
             { text: 'INICIAR JOGO', scene: 'Fishing' },
+            { text: 'MODO DEBUG', scene: 'TOGGLE_DEBUG' },
             { text: 'SAIR', scene: null }
         ];
+
+        const menuItems = this.debugMode
+            ? [...this.debugMenuItems, { text: 'VOLTAR AO MENU', scene: 'BACK_TO_MENU' }, { text: 'SAIR', scene: null }]
+            : baseMenuItems;
 
         const centerX = this.scale.width / 2;
         const centerY = this.scale.height / 2;
@@ -164,43 +182,47 @@ export default class MenuScene extends Phaser.Scene {
         container.sceneName = sceneName;
         container.bg = bg;
         container.text = buttonText;
+        container.buttonWidth = buttonWidth;
+        container.buttonHeight = buttonHeight;
+        container.buttonScale = scale;
 
         return container;
     }
 
     highlightButton(index) {
         this.buttons.forEach((btn, i) => {
-            if (i === index && btn && btn.bg && btn.text) {
-                btn.bg.clear();
-                btn.bg.fillStyle(0xFF6B00, 0.9);
-                btn.bg.fillRoundedRect(-120, -20, 240, 40, 8);
-                btn.bg.lineStyle(3, 0xFFFFFF, 1);
-                btn.bg.strokeRoundedRect(-120, -20, 240, 40, 8);
+            if (btn && btn.bg && btn.text) {
+                const width = btn.buttonWidth || 240;
+                const height = btn.buttonHeight || 40;
+                const radius = 8 * (btn.buttonScale || 1);
 
-                if (btn.text) {
+                btn.bg.clear();
+                if (i === index) {
+                    btn.bg.fillStyle(0xFF6B00, 0.9);
+                    btn.bg.fillRoundedRect(-width / 2, -height / 2, width, height, radius);
+                    btn.bg.lineStyle(3, 0xFFFFFF, 1);
+                    btn.bg.strokeRoundedRect(-width / 2, -height / 2, width, height, radius);
+
                     btn.text.setColor('#FFFFFF');
-                }
-                btn.setScale(1.05);
+                    btn.setScale((btn.buttonScale || 1) * 1.05);
 
-                // Efeito de luz
-                this.tweens.killTweensOf(btn);
-                this.tweens.add({
-                    targets: btn,
-                    scale: 1.1,
-                    duration: 300,
-                    ease: 'Power2.easeOut'
-                });
-            } else if (btn && btn.bg && btn.text) {
-                btn.bg.clear();
-                btn.bg.fillStyle(0x2a2a2a, 0.8);
-                btn.bg.fillRoundedRect(-120, -20, 240, 40, 8);
-                btn.bg.lineStyle(2, 0xFF6B00, 0.5);
-                btn.bg.strokeRoundedRect(-120, -20, 240, 40, 8);
+                    // Efeito de luz
+                    this.tweens.killTweensOf(btn);
+                    this.tweens.add({
+                        targets: btn,
+                        scale: (btn.buttonScale || 1) * 1.1,
+                        duration: 300,
+                        ease: 'Power2.easeOut'
+                    });
+                } else {
+                    btn.bg.fillStyle(0x2a2a2a, 0.8);
+                    btn.bg.fillRoundedRect(-width / 2, -height / 2, width, height, radius);
+                    btn.bg.lineStyle(2, 0xFF6B00, 0.5);
+                    btn.bg.strokeRoundedRect(-width / 2, -height / 2, width, height, radius);
 
-                if (btn.text) {
                     btn.text.setColor('#FFD700');
+                    btn.setScale(btn.buttonScale || 1);
                 }
-                btn.setScale(1);
             }
         });
 
@@ -211,7 +233,62 @@ export default class MenuScene extends Phaser.Scene {
         this.highlightButton(index);
     }
 
+    createDebugInfo() {
+        const infoText = [
+            'DEBUG: pressione D para alternar o modo debug',
+            'Use ↑ / ↓ e ENTER para selecionar uma fase',
+            'Pressione ESC para voltar ao menu',
+            'Modo debug: DESATIVADO'
+        ];
+
+        this.debugInfo = this.add.text(this.scale.width * 0.02, this.scale.height * 0.96, infoText.join('\n'), {
+            fontFamily: 'Arial, sans-serif',
+            fontSize: '14px',
+            color: '#FFFFFF',
+            align: 'left',
+            backgroundColor: 'rgba(0, 0, 0, 0.45)',
+            padding: { x: 10, y: 8 }
+        }).setOrigin(0, 1).setScrollFactor(0).setDepth(200);
+    }
+
+    clearMenuButtons() {
+        this.buttons.forEach((btn) => {
+            if (btn) {
+                btn.destroy();
+            }
+        });
+        this.buttons = [];
+    }
+
+    toggleDebugMode() {
+        this.debugMode = !this.debugMode;
+        this.game.debugMode = this.debugMode;
+        this.createMainMenu();
+
+        if (this.debugInfo) {
+            const debugState = this.debugMode ? 'ATIVO' : 'DESATIVADO';
+            this.debugInfo.setText([
+                'DEBUG: pressione D para alternar o modo debug',
+                'Use ↑ / ↓ e ENTER para selecionar uma fase',
+                'Pressione ESC para voltar ao menu',
+                `Modo debug: ${debugState}`
+            ].join('\n'));
+        }
+    }
+
     handleButtonClick(sceneName, index) {
+        if (sceneName === 'TOGGLE_DEBUG') {
+            this.toggleDebugMode();
+            return;
+        }
+
+        if (sceneName === 'BACK_TO_MENU') {
+            if (this.debugMode) {
+                this.toggleDebugMode();
+            }
+            return;
+        }
+
         // Regra de Ouro: Tenta forçar a tela cheia antes de iniciar a transição
         // Isso funciona aqui porque a função foi originada de um clique ou teclado!
         if (!this.scale.isFullscreen && sceneName !== null) {
@@ -252,7 +329,19 @@ export default class MenuScene extends Phaser.Scene {
             this.handleButtonClick(selectedButton.sceneName, this.selectedIndex);
         });
 
-        // BÔNUS DE GAME DESIGN: Tecla 'F' para alternar Tela Cheia a qualquer momento
+        // Tecla 'D' ativa/desativa o modo debug
+        this.input.keyboard.on('keydown-D', () => {
+            this.toggleDebugMode();
+        });
+
+        // Tecla 'ESC' volta ao menu principal quando estiver no modo debug
+        this.input.keyboard.on('keydown-ESC', () => {
+            if (this.debugMode) {
+                this.toggleDebugMode();
+            }
+        });
+
+        // Tecla 'F' alterna Tela Cheia a qualquer momento
         this.input.keyboard.on('keydown-F', () => {
             if (this.scale.isFullscreen) {
                 this.scale.stopFullscreen();
