@@ -9,7 +9,7 @@ export default class MenuScene extends Phaser.Scene {
         this.debugMode = false;
         this.debugMenuItems = [
             { text: 'Intro', scene: 'IntroScene' },
-            { text: 'Fishing', scene: 'Fishing' },
+            { text: 'Fishing', scene: 'FishingScene' },
             { text: 'Chegada (Arrival)', scene: 'Level1_Arrival' },
             { text: 'Acampamento', scene: 'Level4_Camp' },
             { text: 'Floresta Escura', scene: 'Level5_DarkForest' },

@@ -85,6 +85,13 @@ export default class Level5_DarkForest extends Phaser.Scene {
         if (now - this.lastDamageTime < this.damageCooldown) {
             return;
         }
+
+        // Verificar distância para dano mais justo
+        const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, enemy.x, enemy.y);
+        if (distance > 40) {
+            return;
+        }
+
         this.lastDamageTime = now;
         
         // Inimigo de sombra só causa dano se a luz estiver desligada

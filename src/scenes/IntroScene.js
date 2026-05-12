@@ -15,7 +15,7 @@ export default class IntroScene extends Phaser.Scene {
 
         // Timeout de segurança para evitar ficar preso na intro (20 segundos)
         this.safetyTimeout = this.time.delayedCall(20000, () => {
-            console.warn('IntroScene safety timeout triggered - forcing transition to FishingScene');
+            console.warn('IntroScene safety timeout triggered - forcing transition to Level1_Arrival');
             this.forceTransitionToFishing();
         });
 
@@ -56,7 +56,7 @@ export default class IntroScene extends Phaser.Scene {
     forceTransitionToFishing() {
         console.log('forceTransitionToFishing called');
         this.tweens.killAll();
-        this.scene.start('Fishing');
+        this.scene.start('Level1_Arrival');
     }
 
     showArrivalSequence() {
@@ -85,8 +85,8 @@ export default class IntroScene extends Phaser.Scene {
 
         // Moto chegando da esquerda
         try {
-            const moto = this.add.image(-200, h * 0.7, 'moto_foda');
-            moto.setScale(1.0);
+            const moto = this.add.image(-200, h * 0.7, 'sprite_motoqueiro');
+            moto.setScale(1.5);
             moto.setDepth(5);
 
             // Animação da moto entrando
@@ -94,7 +94,11 @@ export default class IntroScene extends Phaser.Scene {
                 targets: moto,
                 x: w * 0.3,
                 duration: 3000,
-                ease: 'Power2'
+                ease: 'Power2',
+                onComplete: () => {
+                    moto.setTexture('moto_foda');
+                    moto.setScale(1.0);
+                }
             });
         } catch (error) {
             console.error('Error with moto animation:', error);
@@ -165,16 +169,16 @@ export default class IntroScene extends Phaser.Scene {
                     this.cameras.main.fade(1500, 0, 0, 0, false);
                     
                     this.time.delayedCall(1600, () => {
-                        console.log('Transitioning to Fishing scene');
+                        console.log('Transitioning to Level1_Arrival scene');
                         try {
                             // Stop any active animations to prevent conflicts
                             this.tweens.killAll();
-                            this.scene.start('Fishing');
+                            this.scene.start('Level1_Arrival');
                         } catch (error) {
-                            console.error('Error starting Fishing scene:', error);
+                            console.error('Error starting Level1_Arrival scene:', error);
                             // Fallback: try starting by scene key
                             this.scene.stop('IntroScene');
-                            this.scene.start('Fishing');
+                            this.scene.start('Level1_Arrival');
                         }
                     });
                 });

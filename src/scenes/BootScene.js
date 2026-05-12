@@ -34,6 +34,9 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('estrada_pixel_art', './assets/estrada_pixel_art.png');
         this.load.image('bg_dark_forest', './assets/forest/vegetation/dark%20forest.png');
         this.load.image('moto_foda', './assets/moto_foda.png');
+        this.load.image('sprite_motoqueiro', './assets/Vaguetti/sprite_motoqueiro.png');
+        this.load.image('fishing_scene', './assets/fishing-scene.png');
+        this.load.image('pesca_night', './assets/pesca_night.png');
 
         // Árvores animadas do Lost Pixel Art
         this.load.image('tree_1_1', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 1.png');

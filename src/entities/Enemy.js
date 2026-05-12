@@ -9,6 +9,9 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.type = type; // 'light' ou 'shadow'
         this.setCollideWorldBounds(false); // Desativar colisão com bordas do mundo
         this.speed = type === 'light' ? 80 : 120;
+        this.attackRange = type === 'light' ? 200 : 250;
+        this.lastAttackTime = 0;
+        this.attackCooldown = 1000;
         this.maxHealth = 60;
         this.health = 60;
 
@@ -102,16 +105,16 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         // ========================
         if (this.type === 'light') {
             // Só age com luz acesa
-            if (playerIsVisible && distance < 400) {
+            if (playerIsVisible && distance < 600) {
                 this.state = 'CHASE';
             } else {
                 this.state = 'IDLE';
             }
         } else {
             // Sombra age no escuro
-            if (!playerIsVisible && distance < 800) {
+            if (!playerIsVisible && distance < 1200) {
                 this.state = 'CHASE';
-            } else if (playerIsVisible && distance < 100) {
+            } else if (playerIsVisible && distance < 150) {
                 // Se o player ligar a luz muito próxima, ele recua (distância reduzida)
                 this.state = 'IDLE';
                 const angle = Phaser.Math.Angle.Between(
