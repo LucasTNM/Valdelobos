@@ -69,7 +69,7 @@ export default class Level6_Escape extends Phaser.Scene {
 
     spawnEnemies(w, h) {
         for (let i = 0; i < 5; i++) {
-            const x = 500 + Math.random() * (w - 600);
+            const x = w * 0.2 + Math.random() * (w * 0.6);
             const type = Math.random() > 0.5 ? 'light' : 'shadow';
             const tex = type === 'light' ? 'enemy_light_tex' : 'enemy_shadow_tex';
             const enemy = new Enemy(this, x, h * 0.7, tex, type);

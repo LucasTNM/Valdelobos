@@ -11,7 +11,7 @@ export default class Level4_Camp extends Phaser.Scene {
 
     preload() {
         this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
-        this.load.image('bg_dark_forest', './assets/dark_forest.png');
+        this.load.image('bg_dark_forest', './assets/acapamento.png');
         this.load.image('querosene', './assets/querosene.png');
     }
 
@@ -168,6 +168,13 @@ export default class Level4_Camp extends Phaser.Scene {
         if (now - this.lastDamageTime < this.damageCooldown) {
             return;
         }
+
+        // Verificar distância para dano mais justo
+        const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, enemy.x, enemy.y);
+        if (distance > 40) {
+            return;
+        }
+
         this.lastDamageTime = now;
         
         // Inimigo de sombra só causa dano se a luz estiver desligada

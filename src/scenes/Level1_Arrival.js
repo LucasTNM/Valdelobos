@@ -54,11 +54,6 @@ export default class Level1_Arrival extends Phaser.Scene {
             delay: 3000
         });
 
-        // Grupo de Inimigos
-        this.enemies = this.physics.add.group({
-            runChildUpdate: true
-        });
-
         // Personagem Vaguetti (Player)
         this.player = new Player(this, this.scale.width * 0.15, h * 0.65);
         const vaguettiScale = Math.min(h / 600, 1) * 1.0;
@@ -81,14 +76,7 @@ export default class Level1_Arrival extends Phaser.Scene {
             this.tweens.add({ targets: controlText, alpha: 0, duration: 1000 });
         });
 
-        // Spawn de inimigos após o pôr do sol
-        this.time.delayedCall(8000, () => {
-            this.spawnEnemy(w * 0.7, h * 0.7, 'light');
-            this.spawnEnemy(w * 0.9, h * 0.7, 'shadow');
-        });
-
-        // Colisões (apenas para dano no player por enquanto)
-        this.physics.add.overlap(this.player, this.enemies, (p, e) => this.handlePlayerDamage(e));
+        // Cena segura: sem spawn de inimigos nem colisões hostis
 
         // Configurar Câmera
         this.cameras.main.setBounds(0, 0, w, h);
@@ -256,7 +244,7 @@ export default class Level1_Arrival extends Phaser.Scene {
         this.isTransitioning = true;
         this.cameras.main.fade(500, 0, 0, 0);
         this.time.delayedCall(500, () => {
-            this.scene.start('Level4_Camp');
+            this.scene.start('FishingScene');
         });
     }
 

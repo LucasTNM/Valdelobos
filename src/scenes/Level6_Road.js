@@ -47,9 +47,9 @@ export default class Level6_Road extends Phaser.Scene {
 
         // A Moto (Objetivo Final) - no final da estrada
         this.motoContainer = this.add.container(worldWidth * 0.75, h * 0.7);
-        const motoImg = this.add.image(0, 0, 'moto');
-        motoImg.setScale(0.8);
-        this.motoContainer.add(motoImg);
+        this.motoImg = this.add.image(0, 0, 'moto');
+        this.motoImg.setScale(0.6);
+        this.motoContainer.add(this.motoImg);
         this.physics.add.existing(this.motoContainer, true);
         this.motoContainer.setDepth(15);
 
@@ -148,23 +148,23 @@ export default class Level6_Road extends Phaser.Scene {
         switch (direction) {
             case 'behind-top':
                 // De trás, na parte superior
-                spawnX = this.player.x - 1000 + Math.random() * 200;
-                spawnY = h * 0.3;
+                spawnX = this.player.x - 600 + Math.random() * 400;
+                spawnY = h * 0.4;
                 break;
             case 'behind-bottom':
                 // De trás, na parte inferior
-                spawnX = this.player.x - 1000 + Math.random() * 200;
-                spawnY = h * 0.9;
+                spawnX = this.player.x - 600 + Math.random() * 400;
+                spawnY = h * 0.6;
                 break;
             case 'top':
                 // De cima
-                spawnX = this.player.x - 300 + Math.random() * 600;
-                spawnY = h * 0.05;
+                spawnX = this.player.x - 200 + Math.random() * 400;
+                spawnY = h * 0.2;
                 break;
             case 'bottom':
                 // De baixo
-                spawnX = this.player.x - 300 + Math.random() * 600;
-                spawnY = h * 1.0;
+                spawnX = this.player.x - 200 + Math.random() * 400;
+                spawnY = h * 0.8;
                 break;
         }
 
@@ -192,14 +192,28 @@ export default class Level6_Road extends Phaser.Scene {
             targets: this.player,
             x: worldWidth * 0.9,
             duration: 3000,
-            ease: 'Linear'
+            ease: 'Linear',
+            onStart: () => {
+                this.player.setVisible(false);
+            },
+            onComplete: () => {
+                this.player.setVisible(true);
+            }
         });
         
         this.tweens.add({
             targets: this.motoContainer,
             x: worldWidth * 0.95,
             duration: 3000,
-            ease: 'Linear'
+            ease: 'Linear',
+            onStart: () => {
+                this.motoImg.setTexture('sprite_motoqueiro');
+                this.motoImg.setScale(0.9);
+            },
+            onComplete: () => {
+                this.motoImg.setTexture('moto_foda');
+                this.motoImg.setScale(0.6);
+            }
         });
 
         this.add.text(w * 0.5, h * 0.5, 'VOCÊ ESCAPOU!', {
@@ -220,6 +234,13 @@ export default class Level6_Road extends Phaser.Scene {
         if (now - this.lastDamageTime < this.damageCooldown) {
             return;
         }
+
+        // Verificar distância para dano mais justo
+        const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, enemy.x, enemy.y);
+        if (distance > 40) {
+            return;
+        }
+
         this.lastDamageTime = now;
         
         // Inimigo de sombra só causa dano se a luz estiver desligada
