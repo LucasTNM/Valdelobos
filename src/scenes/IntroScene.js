@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { playAmbient } from '../utils/ambientAudio';
 
 export default class IntroScene extends Phaser.Scene {
     constructor() {
@@ -12,6 +13,18 @@ export default class IntroScene extends Phaser.Scene {
         const centerY = h / 2;
 
         console.log('IntroScene create() initialized');
+
+        // Áudio ambiente da floresta
+        playAmbient(this, 'floresta', 0.06);
+
+        // Configurar áudio da moto
+        this.motoSound = null;
+        this.events.once('shutdown', () => {
+            if (this.motoSound) {
+                this.motoSound.stop();
+                this.motoSound.destroy();
+            }
+        });
 
         // Timeout de segurança para evitar ficar preso na intro (20 segundos)
         this.safetyTimeout = this.time.delayedCall(20000, () => {
@@ -85,8 +98,15 @@ export default class IntroScene extends Phaser.Scene {
 
         // Moto chegando da esquerda
         try {
+            if (!this.motoSound) {
+                this.motoSound = this.sound.add('moto', {
+                    loop: true,
+                    volume: 0.35
+                });
+            }
+
             const moto = this.add.image(-200, h * 0.7, 'sprite_motoqueiro');
-            moto.setScale(1.5);
+            moto.setScale(0.6);
             moto.setDepth(5);
 
             // Animação da moto entrando
@@ -95,7 +115,15 @@ export default class IntroScene extends Phaser.Scene {
                 x: w * 0.3,
                 duration: 3000,
                 ease: 'Power2',
+                onStart: () => {
+                    if (this.motoSound && !this.motoSound.isPlaying) {
+                        this.motoSound.play();
+                    }
+                },
                 onComplete: () => {
+                    if (this.motoSound && this.motoSound.isPlaying) {
+                        this.motoSound.stop();
+                    }
                     moto.setTexture('moto_foda');
                     moto.setScale(1.0);
                 }
