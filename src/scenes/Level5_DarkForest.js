@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Player from '../entities/Player';
 import Enemy from '../entities/Enemy';
+import { playAmbient } from '../utils/ambientAudio';
 
 export default class Level5_DarkForest extends Phaser.Scene {
     constructor() {
@@ -25,6 +26,9 @@ export default class Level5_DarkForest extends Phaser.Scene {
         this.player = new Player(this, 100, h * 0.7);
         const vaguettiScale = Math.min(h / 600, 1) * 0.7;
         this.player.setScale(vaguettiScale);
+
+        // Áudio ambiente noturno
+        playAmbient(this, 'noite', 0.08);
         this.player.setDepth(10);
         this.player.light.setDepth(101);
         this.player.beam.setDepth(102);

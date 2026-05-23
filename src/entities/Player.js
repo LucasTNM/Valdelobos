@@ -59,11 +59,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Debug visual de colisões
         this.debugBody = scene.add.graphics();
         this.debugBody.setDepth(1000);
-        this.on('destroy', () => {
-            if (this.debugBody) {
-                this.debugBody.destroy();
-            }
-        });
 
         // Teclas de controle
         this.cursors = scene.input.keyboard.createCursorKeys();
@@ -75,14 +70,47 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             toggleLight: Phaser.Input.Keyboard.KeyCodes.F
         });
 
+        // Áudio de passos do jogador
+        this.stepSound = scene.sound.add('passo', {
+            loop: true,
+            volume: 0.18
+        });
+
+        // Áudio do lampião (liga/desliga)
+        this.lampSound = scene.sound.add('lamp', {
+            loop: false,
+            volume: 0.18,
+            allowMultiple: false
+        });
+
         // Flag para controlar animação
         this.isAnimationPlaying = false;
+
+        this.on('destroy', () => {
+            if (this.debugBody) {
+                this.debugBody.destroy();
+            }
+            if (this.stepSound) {
+                this.stepSound.stop();
+                this.stepSound.destroy();
+            }
+        });
     }
 
     update() {
         // Alternar lampião (Tecla F)
         if (Phaser.Input.Keyboard.JustDown(this.wasd.toggleLight)) {
             this.toggleLight();
+        }
+
+        if (this.isFishing) {
+            this.setVelocity(0, 0);
+            this.anims.stop();
+            this.isAnimationPlaying = false;
+            if (this.stepSound && this.stepSound.isPlaying) {
+                this.stepSound.stop();
+            }
+            return;
         }
         
         // Verificar se há movimento
@@ -110,6 +138,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             isMoving = true;
         } else {
             this.setVelocityY(0);
+        }
+
+        // Áudio de passos: tocar em loop apenas quando estiver andando
+        if (isMoving) {
+            if (this.stepSound && !this.stepSound.isPlaying) {
+                this.stepSound.play();
+            }
+        } else if (this.stepSound && this.stepSound.isPlaying) {
+            this.stepSound.stop();
         }
 
         // Controlar animação com base no movimento
@@ -323,6 +360,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.light.setAlpha(0);
                 this.isAttacking = false;
                 this.beam.setAlpha(0);
+            }
+
+            // Som de ligar/desligar lampião
+            if (this.lampSound) {
+                this.lampSound.play();
             }
             
             // Som de clique (feedback visual por enquanto)

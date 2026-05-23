@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Player from '../entities/Player';
 import Enemy from '../entities/Enemy';
+import { playAmbient } from '../utils/ambientAudio';
 
 export default class Level4_Camp extends Phaser.Scene {
     constructor() {
@@ -11,7 +12,7 @@ export default class Level4_Camp extends Phaser.Scene {
 
     preload() {
         this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
-        this.load.image('bg_dark_forest', './assets/acapamento.png');
+        this.load.image('bg_dark_forest', './assets/acapamento.jpg');
         this.load.image('querosene', './assets/querosene.png');
     }
 
@@ -37,6 +38,9 @@ export default class Level4_Camp extends Phaser.Scene {
         this.player = new Player(this, w * 0.2, h * 0.7);
         const vaguettiScale = Math.min(h / 600, 1) * 0.7;
         this.player.setScale(vaguettiScale);
+
+        // Áudio ambiente noturno
+        playAmbient(this, 'noite', 0.08);
         this.player.setDepth(10);
         this.player.light.setDepth(101);
         this.player.beam.setDepth(102);

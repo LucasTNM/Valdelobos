@@ -32,16 +32,16 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             // Configurações de hitbox específicas para cada tipo
             const hitboxSettings = {
                 light: {
-                    widthScale: 0.1,
-                    heightScale: 0.2,
-                    offsetXAdjustment: -100,
-                    offsetYAdjustment: -175
+                    widthScale: 0.18,
+                    heightScale: 0.26,
+                    offsetXAdjustment: 0,
+                    offsetYAdjustment: -150
                 },
                 shadow: {
-                    widthScale: 0.35,
-                    heightScale: 0.75,
-                    offsetXAdjustment: -8,
-                    offsetYAdjustment: -10
+                    widthScale: 0.28,
+                    heightScale: 0.58,
+                    offsetXAdjustment: 0,
+                    offsetYAdjustment: -20
                 }
             };
 
@@ -53,10 +53,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
             this.body.setSize(bodyWidth, bodyHeight);
             this.body.setOffset(offsetX, offsetY);
-
-            // Ajuste esses valores para calibrar o hitbox de cada inimigo:
-            // - light.widthScale / light.heightScale / light.offsetXAdjustment / light.offsetYAdjustment
-            // - shadow.widthScale / shadow.heightScale / shadow.offsetXAdjustment / shadow.offsetYAdjustment
         }
 
         // Barra de vida do inimigo
@@ -67,9 +63,40 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         // Debug visual de colisões
         this.debugBody = scene.add.graphics();
         this.debugBody.setDepth(1000);
+
+        // Áudio de monstros compartilhado por cena
+        if (!scene.monsterSound) {
+            scene.monsterSound = scene.sound.add('monstro', {
+                loop: true,
+                volume: 0.18
+            });
+            scene.monsterSound.play();
+            scene.monsterSoundEnemyCount = 0;
+        }
+        scene.monsterSoundEnemyCount = (scene.monsterSoundEnemyCount || 0) + 1;
+
+        if (!scene.monsterSoundShutdownRegistered) {
+            scene.events.once('shutdown', () => {
+                if (scene.monsterSound) {
+                    scene.monsterSound.stop();
+                    scene.monsterSound.destroy();
+                    scene.monsterSound = null;
+                }
+                scene.monsterSoundEnemyCount = 0;
+            });
+            scene.monsterSoundShutdownRegistered = true;
+        }
+
         this.on('destroy', () => {
             if (this.debugBody) {
                 this.debugBody.destroy();
+            }
+
+            scene.monsterSoundEnemyCount = Math.max(0, (scene.monsterSoundEnemyCount || 1) - 1);
+            if (scene.monsterSoundEnemyCount === 0 && scene.monsterSound) {
+                scene.monsterSound.stop();
+                scene.monsterSound.destroy();
+                scene.monsterSound = null;
             }
         });
 

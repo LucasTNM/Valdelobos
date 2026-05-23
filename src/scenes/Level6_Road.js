@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Player from '../entities/Player';
 import Enemy from '../entities/Enemy';
+import { playAmbient } from '../utils/ambientAudio';
 
 export default class Level6_Road extends Phaser.Scene {
     constructor() {
@@ -36,6 +37,9 @@ export default class Level6_Road extends Phaser.Scene {
         this.player = new Player(this, 150, h * 0.7);
         const vaguettiScale = Math.min(h / 600, 1) * 0.7;
         this.player.setScale(vaguettiScale);
+
+        // Áudio ambiente noturno
+        playAmbient(this, 'noite', 0.08);
         this.player.setDepth(10);
         this.player.light.setDepth(101);
         this.player.beam.setDepth(102);
@@ -52,6 +56,18 @@ export default class Level6_Road extends Phaser.Scene {
         this.motoContainer.add(this.motoImg);
         this.physics.add.existing(this.motoContainer, true);
         this.motoContainer.setDepth(15);
+
+        // Áudio da moto objetivo
+        this.motoSound = this.sound.add('moto', {
+            loop: true,
+            volume: 0.35
+        });
+        this.events.once('shutdown', () => {
+            if (this.motoSound) {
+                this.motoSound.stop();
+                this.motoSound.destroy();
+            }
+        });
 
         // Inimigos Perseguidores
         this.enemies = this.physics.add.group({ runChildUpdate: true });
@@ -208,9 +224,15 @@ export default class Level6_Road extends Phaser.Scene {
             ease: 'Linear',
             onStart: () => {
                 this.motoImg.setTexture('sprite_motoqueiro');
-                this.motoImg.setScale(0.9);
+                this.motoImg.setScale(0.6);
+                if (this.motoSound && !this.motoSound.isPlaying) {
+                    this.motoSound.play();
+                }
             },
             onComplete: () => {
+                if (this.motoSound && this.motoSound.isPlaying) {
+                    this.motoSound.stop();
+                }
                 this.motoImg.setTexture('moto_foda');
                 this.motoImg.setScale(0.6);
             }

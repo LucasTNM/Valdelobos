@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Player from '../entities/Player';
 import Enemy from '../entities/Enemy';
+import { playAmbient } from '../utils/ambientAudio';
 
 export default class Level1_Arrival extends Phaser.Scene {
     constructor() {
@@ -81,6 +82,9 @@ export default class Level1_Arrival extends Phaser.Scene {
         // Configurar Câmera
         this.cameras.main.setBounds(0, 0, w, h);
         this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
+
+        // Áudio ambiente da floresta
+        playAmbient(this, 'floresta', 0.12);
 
         // Título da cena com animação - RESPONSIVO (Fixado na tela)
         const uiScale = this.scale.width / 1200;

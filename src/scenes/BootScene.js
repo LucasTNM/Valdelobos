@@ -35,6 +35,17 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('bg_dark_forest', './assets/forest/vegetation/dark%20forest.png');
         this.load.image('moto_foda', './assets/moto_foda.png');
         this.load.image('sprite_motoqueiro', './assets/Vaguetti/sprite_motoqueiro.png');
+        this.load.image('sprite_pescador', './assets/Vaguetti/sprite_pescador.png');
+
+        // Áudio do jogo
+        this.load.audio('passo', './assets/audio/sfx/passo.mp3');
+        this.load.audio('moto', './assets/audio/sfx/moto.mp3');
+        this.load.audio('floresta', './assets/audio/sfx/floresta.mp3');
+        this.load.audio('noite', './assets/audio/sfx/noite.mp3');
+        this.load.audio('monstro', './assets/audio/sfx/monstro.mp3');
+        this.load.audio('susto', './assets/audio/sfx/susto.mp3');
+        this.load.audio('lamp', './assets/audio/sfx/lamp.mp3');
+
         this.load.image('fishing_scene', './assets/fishing-scene.png');
         this.load.image('pesca_night', './assets/pesca_night.png');
 
