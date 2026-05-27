@@ -102,11 +102,17 @@ export default class Level5_DarkForest extends Phaser.Scene {
         if (enemy.type === 'shadow' && this.player.isLightOn) {
             return; // Não causa dano
         }
-        this.player.takeDamage(25);
+        this.player.takeDamage(25, enemy.type);
     }
 
-    gameOver() {
-        this.scene.start('GameOver');
+    gameOver(cause) {
+        this.physics.pause();
+        this.player.setTint(0x444444);
+        if (cause === 'light' || cause === 'shadow') {
+            this.scene.start('JumpScareScene', { type: cause });
+        } else {
+            this.scene.start('GameOver');
+        }
     }
 
     update() {

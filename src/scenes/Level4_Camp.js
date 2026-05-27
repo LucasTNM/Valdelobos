@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import Player from '../entities/Player';
 import Enemy from '../entities/Enemy';
 import { playAmbient } from '../utils/ambientAudio';
+import { showDialogue } from '../utils/dialogue';
 
 export default class Level4_Camp extends Phaser.Scene {
     constructor() {
@@ -53,6 +54,9 @@ export default class Level4_Camp extends Phaser.Scene {
         // Câmera
         this.cameras.main.setBounds(0, 0, w, h);
         this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
+
+        // ===== DIÁLOGO INICIAL DO LEVEL4_CAMP =====
+        showDialogue(this, 'O QUE SÃO ESSAS COISAS?');
 
         // Itens: Frascos de Querosene
         this.createFuelItems(w, h);
@@ -185,11 +189,17 @@ export default class Level4_Camp extends Phaser.Scene {
         if (enemy.type === 'shadow' && this.player.isLightOn) {
             return; // Não causa dano
         }
-        this.player.takeDamage(20);
+        this.player.takeDamage(20, enemy.type);
     }
 
-    gameOver() {
-        this.scene.start('GameOver');
+    gameOver(cause) {
+        this.physics.pause();
+        this.player.setTint(0x444444);
+        if (cause === 'light' || cause === 'shadow') {
+            this.scene.start('JumpScareScene', { type: cause });
+        } else {
+            this.scene.start('GameOver');
+        }
     }
 
     continueGame() {

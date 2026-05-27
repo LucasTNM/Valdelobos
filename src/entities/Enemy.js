@@ -19,23 +19,25 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         if (scene.player && scene.player.height > 0 && this.height > 0) {
             const heroDisplayHeight = scene.player.height * scene.player.scaleY;
             const targetHeight = heroDisplayHeight * 0.5; // reduzido para 50% do herói
-            const scale = targetHeight / this.height;
-            this.setScale(scale);
+            const baseScale = targetHeight / this.height;
+            const typeScale = this.type === 'light' ? 0.85 : 1;
+            this.setScale(baseScale * typeScale);
         } else {
-            this.setScale(0.8); // fallback menor também
+            const typeScale = this.type === 'light' ? 0.85 : 1;
+            this.setScale(0.8 * typeScale); // fallback menor também
         }
 
         this.setOrigin(0.5, 1); // igual ao jogador para alinhamento de chão
 
-        // Collision body - Hitbox separada por tipo de inimigo
+        // ===== CONFIGURAÇÃO DA HITBOX DO MONSTRO DA LUZ =====
+        // Tamanho e deslocamento do corpo de colisão
         if (this.body) {
-            // Configurações de hitbox específicas para cada tipo
             const hitboxSettings = {
                 light: {
-                    widthScale: 0.18,
-                    heightScale: 0.26,
+                    widthScale: 0.16,
+                    heightScale: 0.24,
                     offsetXAdjustment: 0,
-                    offsetYAdjustment: -150
+                    offsetYAdjustment: 0
                 },
                 shadow: {
                     widthScale: 0.28,
@@ -49,8 +51,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             const bodyWidth = this.displayWidth * widthScale;
             const bodyHeight = this.displayHeight * heightScale;
             const offsetX = (this.displayWidth - bodyWidth) / 2 + offsetXAdjustment;
-            const offsetY = this.displayHeight - bodyHeight + offsetYAdjustment;
+            const offsetY = (this.displayHeight - bodyHeight) / 2 + offsetYAdjustment;
 
+            // setSize define o tamanho da hitbox
+            // setOffset define a posição do retângulo de colisão relativo ao sprite
             this.body.setSize(bodyWidth, bodyHeight);
             this.body.setOffset(offsetX, offsetY);
         }
@@ -138,21 +142,13 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
                 this.state = 'IDLE';
             }
         } else {
-            // Sombra age no escuro
+            // ===== COMPORTAMENTO DO MONSTRO DA ESCURIDÃO =====
+            // Luz ligada -> fugir
+            // Luz desligada -> perseguir
             if (!playerIsVisible && distance < 1200) {
                 this.state = 'CHASE';
-            } else if (playerIsVisible && distance < 150) {
-                // Se o player ligar a luz muito próxima, ele recua (distância reduzida)
-                this.state = 'IDLE';
-                const angle = Phaser.Math.Angle.Between(
-                    this.target.x, this.target.y,
-                    this.x, this.y
-                );
-                this.setVelocity(
-                    Math.cos(angle) * this.speed,
-                    Math.sin(angle) * this.speed
-                );
-                return;
+            } else if (playerIsVisible) {
+                this.state = 'FLEE';
             } else {
                 this.state = 'IDLE';
             }
@@ -168,6 +164,17 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
                 this.setVelocity(0); // evita orbitar
             }
 
+            this.setFlipX(this.body.velocity.x < 0);
+            this.setRotation(Math.sin(this.scene.time.now * 0.01) * 0.1);
+        } else if (this.state === 'FLEE') {
+            const angle = Phaser.Math.Angle.Between(
+                this.target.x, this.target.y,
+                this.x, this.y
+            );
+            this.setVelocity(
+                Math.cos(angle) * this.speed,
+                Math.sin(angle) * this.speed
+            );
             this.setFlipX(this.body.velocity.x < 0);
             this.setRotation(Math.sin(this.scene.time.now * 0.01) * 0.1);
         } else {
@@ -211,7 +218,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     attack() {
         if (!this.target || !this.target.takeDamage) return;
 
-        this.target.takeDamage(20); // Aumentado de 10 para 20
+        this.target.takeDamage(20, this.type); // Aumentado de 10 para 20
 
         // Feedback visual
         this.setTint(0xff0000);

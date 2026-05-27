@@ -9,6 +9,7 @@ import Level4_Camp from './scenes/Level4_Camp';
 import Level5_DarkForest from './scenes/Level5_DarkForest';
 import Level6_Road from './scenes/Level6_Road';
 import Level6_Escape from './scenes/level6_Escape';
+import JumpScareScene from './scenes/JumpScareScene';
 import GameOver from './scenes/GameOver';
 
 const config = {
@@ -41,6 +42,7 @@ const config = {
         Level5_DarkForest,
         Level6_Road,
         Level6_Escape,
+        JumpScareScene,
         GameOver
     ]
 };

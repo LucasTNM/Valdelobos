@@ -46,6 +46,12 @@ export default class BootScene extends Phaser.Scene {
         this.load.audio('susto', './assets/audio/sfx/susto.mp3');
         this.load.audio('lamp', './assets/audio/sfx/lamp.mp3');
 
+        // Jumpscare assets
+        this.load.video('jumpscare_white', './assets/videos/jumpscare_white_mp4.mp4', 'loadeddata', false, true);
+        this.load.audio('jumpscare_white', './assets/audio/music/jumpscare_white_mp3.mp3');
+        this.load.video('jumpscare_black', './assets/videos/jumpscare_black_mp4.mp4', 'loadeddata', false, true);
+        this.load.audio('jumpscare_black', './assets/audio/music/jumpscare_black_mp3.mp3');
+
         this.load.image('fishing_scene', './assets/fishing-scene.png');
         this.load.image('pesca_night', './assets/pesca_night.png');
 

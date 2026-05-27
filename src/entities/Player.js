@@ -270,6 +270,28 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
+    setVisible(value) {
+        const result = super.setVisible(value);
+
+        if (this.fuelBar) {
+            this.fuelBar.setVisible(value);
+        }
+        if (this.healthBar) {
+            this.healthBar.setVisible(value);
+        }
+        if (this.light) {
+            this.light.setVisible(value && this.isLightOn);
+        }
+        if (this.beam) {
+            this.beam.setVisible(value && this.beam.alpha > 0);
+        }
+        if (this.debugBody) {
+            this.debugBody.setVisible(value && this.scene.game.debugMode);
+        }
+
+        return result;
+    }
+
     setScale(x, y) {
         const result = super.setScale(x, y);
         this.updateCollisionBox();
@@ -326,7 +348,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.fuelBar.strokeRect(barX + 2, barY + (barHeight / 2), (barWidth - 4) * fuelPercent, (barHeight / 2) - 2);
     }
 
-    takeDamage(amount) {
+    takeDamage(amount, attackerType) {
         if (this.isInvincible || this.health <= 0) return;
         
         this.health -= amount;
@@ -337,9 +359,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (this.health <= 0) {
             this.health = 0;
             this.updateFuelBar();
-            // Notificar a cena para o Game Over
+            // Notificar a cena para o Game Over ou jumpscare
             if (this.scene.gameOver) {
-                this.scene.gameOver();
+                this.scene.gameOver(attackerType);
             }
         }
 
