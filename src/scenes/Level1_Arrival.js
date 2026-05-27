@@ -271,16 +271,17 @@ export default class Level1_Arrival extends Phaser.Scene {
         if (enemy.type === 'shadow' && this.player.isLightOn) {
             return; // Não causa dano
         }
-        this.player.takeDamage(10);
+        this.player.takeDamage(10, enemy.type);
     }
 
-    gameOver() {
+    gameOver(cause) {
         this.physics.pause();
         this.player.setTint(0x444444);
-        this.cameras.main.fade(1000, 0, 0, 0);
-        this.time.delayedCall(1000, () => {
+        if (cause === 'light' || cause === 'shadow') {
+            this.scene.start('JumpScareScene', { type: cause });
+        } else {
             this.scene.start('GameOver');
-        });
+        }
     }
 
     createAnimatedTrees(w, h) {

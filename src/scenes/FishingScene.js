@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Player from '../entities/Player';
 import { playAmbient } from '../utils/ambientAudio';
+import { showDialogue } from '../utils/dialogue';
 
 export default class FishingScene extends Phaser.Scene {
     constructor() {
@@ -55,10 +56,19 @@ export default class FishingScene extends Phaser.Scene {
 
         this.cameras.main.setBounds(0, 0, screenWidth, screenHeight);
 
+        showDialogue(this, 'DEVO ME SENTAR NO PIER PARA PESCAR.');
+
         this.time.delayedCall(20000, () => {
             this.cameras.main.fadeOut(2500, 0, 0, 0);
             this.time.delayedCall(2500, () => {
-                this.scene.start('FishingScene_Night');
+                this.scene.start('FishingScene_Night', {
+                    wasFishing: true,
+                    playerState: {
+                        health: this.player.health,
+                        fuel: this.player.fuel,
+                        isLightOn: this.player.isLightOn
+                    }
+                });
             });
         });
     }
@@ -88,7 +98,7 @@ export default class FishingScene extends Phaser.Scene {
         if (this.player.scaleX) {
             // Ajuste a escala do sprite de pesca aqui com setScale().
             // Aumente ou diminua o multiplicador para combinar com o tamanho do player.
-            this.fishingSprite.setScale(this.player.scaleX * 1.0);
+            this.fishingSprite.setScale(this.player.scaleX * 0.8);
         }
     }
 
