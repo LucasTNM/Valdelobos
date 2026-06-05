@@ -17,6 +17,10 @@ export default class Level6_Road extends Phaser.Scene {
     }
 
     create() {
+        this.isEnding = false;
+        this.enemySpawned = false;
+        this.lastDamageTime = 0;
+
         const w = this.scale.width;
         const h = this.scale.height;
 
@@ -71,7 +75,6 @@ export default class Level6_Road extends Phaser.Scene {
 
         // Inimigos Perseguidores
         this.enemies = this.physics.add.group({ runChildUpdate: true });
-        this.enemySpawned = false;
 
         // Iniciar spawn de inimigos após o jogador andar um pouco
         this.time.addEvent({
@@ -83,8 +86,6 @@ export default class Level6_Road extends Phaser.Scene {
                 }
             }
         });
-
-        this.physics.add.overlap(this.player, this.enemies, (p, e) => this.handlePlayerDamage(e));
 
         // UI
         const titleSize = Math.max(24, w / 25);
@@ -156,7 +157,7 @@ export default class Level6_Road extends Phaser.Scene {
 
         const w = this.scale.width;
         const h = this.scale.height;
-        const type = Math.random() > 0.5 ? 'light' : 'shadow';
+        const type = Math.random() < 0.7 ? 'light' : 'shadow';
         const tex = type === 'light' ? 'enemy_light_tex' : 'enemy_shadow_tex';
 
         let spawnX, spawnY;
@@ -251,15 +252,13 @@ export default class Level6_Road extends Phaser.Scene {
     }
 
     handlePlayerDamage(enemy) {
-        // Verificar cooldown para não dar dano múltiplas vezes rapidamente
-        const now = this.time.now;
-        if (now - this.lastDamageTime < this.damageCooldown) {
+        if (!enemy.canAttackTarget || !enemy.canAttackTarget()) {
             return;
         }
 
-        // Verificar distância para dano mais justo
-        const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, enemy.x, enemy.y);
-        if (distance > 40) {
+        // Verificar cooldown para não dar dano múltiplas vezes rapidamente
+        const now = this.time.now;
+        if (now - this.lastDamageTime < this.damageCooldown) {
             return;
         }
 

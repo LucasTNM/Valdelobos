@@ -18,6 +18,9 @@ export default class Level4_Camp extends Phaser.Scene {
     }
 
     create() {
+        this.isTransitioning = false;
+        this.lastDamageTime = 0;
+
         const worldWidth = this.scale.width * 2;
         const worldHeight = this.scale.height;
         this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
@@ -156,13 +159,12 @@ export default class Level4_Camp extends Phaser.Scene {
             });
         });
 
-        this.physics.add.overlap(this.player, this.enemies, (p, e) => this.handlePlayerDamage(e));
     }
 
     spawnEnemies(w, h) {
         for (let i = 0; i < 5; i++) {
             const x = 500 + Math.random() * (w - 600);
-            const type = Math.random() > 0.5 ? 'light' : 'shadow';
+            const type = i < 2 || Math.random() < 0.65 ? 'light' : 'shadow';
             const tex = type === 'light' ? 'enemy_light_tex' : 'enemy_shadow_tex';
             const enemy = new Enemy(this, x, h * 0.7, tex, type);
             enemy.setDepth(10);
@@ -171,15 +173,13 @@ export default class Level4_Camp extends Phaser.Scene {
     }
 
     handlePlayerDamage(enemy) {
-        // Verificar cooldown para não dar dano múltiplas vezes rapidamente
-        const now = this.time.now;
-        if (now - this.lastDamageTime < this.damageCooldown) {
+        if (!enemy.canAttackTarget || !enemy.canAttackTarget()) {
             return;
         }
 
-        // Verificar distância para dano mais justo
-        const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, enemy.x, enemy.y);
-        if (distance > 40) {
+        // Verificar cooldown para não dar dano múltiplas vezes rapidamente
+        const now = this.time.now;
+        if (now - this.lastDamageTime < this.damageCooldown) {
             return;
         }
 

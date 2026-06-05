@@ -15,17 +15,19 @@ export default class FishingScene extends Phaser.Scene {
     }
 
     create() {
+        this.isFishing = false;
+
         const screenWidth = this.scale.width;
         const screenHeight = this.scale.height;
 
         // Coordenadas e tamanho da área de pesca.
         // Ajuste x, y, width, height e sitOffsetY aqui para reposicionar o spot.
         this.fishingSpotConfig = {
-            x: 1200,
-            y: 540,
-            width: 160,
-            height: 100,
-            sitOffsetY: -10
+            x: screenWidth * 0.66,
+            y: screenHeight * 0.48,
+            width: screenWidth * 0.1,
+            height: screenHeight * 0.09,
+            sitOffsetY: 0
         };
 
 

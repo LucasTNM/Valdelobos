@@ -20,6 +20,11 @@ export default class MenuScene extends Phaser.Scene {
     }
 
     create() {
+        this.selectedIndex = 0;
+        this.debugMode = false;
+        this.buttons = [];
+        this.input.keyboard.removeAllListeners();
+
         // Fundo escuro com gradiente
         this.cameras.main.setBackgroundColor('#000000');
         

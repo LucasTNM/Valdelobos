@@ -16,8 +16,13 @@ export default class Level5_DarkForest extends Phaser.Scene {
     }
 
     create() {
-        const w = this.scale.width;
+        this.isTransitioning = false;
+        this.lastDamageTime = 0;
+
+        const screenWidth = this.scale.width;
         const h = this.scale.height;
+        const w = screenWidth * 2;
+        this.physics.world.setBounds(0, 0, w, h);
 
         // Fundo: Dark Forest
         this.add.image(0, 0, 'dark_forest').setOrigin(0, 0).setDisplaySize(w, h).setDepth(-1);
@@ -34,22 +39,23 @@ export default class Level5_DarkForest extends Phaser.Scene {
         this.player.beam.setDepth(102);
         this.player.fuelBar.setDepth(103);
 
+        this.cameras.main.setBounds(0, 0, w, h);
+        this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
+
         // Grupo de Inimigos
         this.enemies = this.physics.add.group({ runChildUpdate: true });
         this.spawnEnemies(w, h);
 
-        this.physics.add.overlap(this.player, this.enemies, (p, e) => this.handlePlayerDamage(e));
-
         // UI
-        const titleSize = Math.max(24, w / 25);
-        this.add.text(w * 0.5, h * 0.1, 'A FLORESTA ESCURA', {
+        const titleSize = Math.max(24, screenWidth / 25);
+        this.add.text(screenWidth * 0.5, h * 0.1, 'A FLORESTA ESCURA', {
             fontFamily: 'Arial, sans-serif',
             fontSize: titleSize + 'px',
             color: '#FF6B00',
             fontStyle: 'bold'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(200);
 
-        this.add.text(w * 0.5, h * 0.18, 'Siga para a direita em busca de uma saída.', {
+        this.add.text(screenWidth * 0.5, h * 0.18, 'Siga para a direita em busca de uma saída.', {
             fontFamily: 'Arial, sans-serif',
             fontSize: '18px',
             color: '#CCCCCC'
@@ -74,8 +80,8 @@ export default class Level5_DarkForest extends Phaser.Scene {
 
     spawnEnemies(w, h) {
         for (let i = 0; i < 5; i++) {
-            const x = 500 + Math.random() * (w - 600);
-            const type = Math.random() > 0.5 ? 'light' : 'shadow';
+            const x = 500 + Math.random() * (w - 900);
+            const type = i === 0 || Math.random() < 0.55 ? 'light' : 'shadow';
             const tex = type === 'light' ? 'enemy_light_tex' : 'enemy_shadow_tex';
             const enemy = new Enemy(this, x, h * 0.7, tex, type);
             enemy.setDepth(10);
@@ -84,15 +90,13 @@ export default class Level5_DarkForest extends Phaser.Scene {
     }
 
     handlePlayerDamage(enemy) {
-        // Verificar cooldown para não dar dano múltiplas vezes rapidamente
-        const now = this.time.now;
-        if (now - this.lastDamageTime < this.damageCooldown) {
+        if (!enemy.canAttackTarget || !enemy.canAttackTarget()) {
             return;
         }
 
-        // Verificar distância para dano mais justo
-        const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, enemy.x, enemy.y);
-        if (distance > 40) {
+        // Verificar cooldown para não dar dano múltiplas vezes rapidamente
+        const now = this.time.now;
+        if (now - this.lastDamageTime < this.damageCooldown) {
             return;
         }
 

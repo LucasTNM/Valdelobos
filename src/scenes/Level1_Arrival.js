@@ -18,6 +18,9 @@ export default class Level1_Arrival extends Phaser.Scene {
 }
 
     create() {
+        this.isTransitioning = false;
+        this.lastDamageTime = 0;
+
         // Redefinir limites do mundo para permitir exploração horizontal
         const worldWidth = this.scale.width * 2;
         const worldHeight = this.scale.height;

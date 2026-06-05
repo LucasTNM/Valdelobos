@@ -15,6 +15,8 @@ export default class FishingScene_Night extends Phaser.Scene {
     }
 
     create() {
+        this.isFishing = false;
+
         const screenWidth = this.scale.width;
         const screenHeight = this.scale.height;
 
@@ -22,11 +24,11 @@ export default class FishingScene_Night extends Phaser.Scene {
         // Coordenadas sincronizadas com FishingScene
         // Agora usa os mesmos valores fixos do FishingScene para alinhar os spots.
         this.fishingSpotConfig = {
-            x: 1200,
-            y: 540,
-            width: 160,
-            height: 100,
-            sitOffsetY: -10
+            x: screenWidth * 0.66,
+            y: screenHeight * 0.48,
+            width: screenWidth * 0.1,
+            height: screenHeight * 0.09,
+            sitOffsetY: 0
         };
 
         this.fishingSpot = this.add.zone(this.fishingSpotConfig.x, this.fishingSpotConfig.y, this.fishingSpotConfig.width, this.fishingSpotConfig.height)

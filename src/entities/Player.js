@@ -153,6 +153,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (isMoving) {
             if (!this.isAnimationPlaying) {
                 this.setTexture('vaguetti_frame_0'); // Trocar para primeira frame da animação
+                this.updateCollisionBox();
                 this.play('vaguetti_walk');
                 this.isAnimationPlaying = true;
             }
@@ -160,6 +161,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             if (this.isAnimationPlaying) {
                 this.stop();
                 this.setTexture('vaguetti'); // Voltar à imagem default
+                this.updateCollisionBox();
                 this.isAnimationPlaying = false;
             }
         }
@@ -252,13 +254,40 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     updateCollisionBox() {
         if (!this.body) return;
 
-        const bodyWidth = this.displayWidth * 0.4;
-        const bodyHeight = this.displayHeight/2;
-        const offsetX = (this.displayWidth - bodyWidth);
-        const offsetY = this.displayHeight - bodyHeight;
+        const bounds = this.getVisibleBounds();
+        const visibleWidth = bounds.right - bounds.left + 1;
+        const bodyWidth = visibleWidth * 0.7;
+        const bodyHeight = 24;
+        const offsetX = ((bounds.left + bounds.right) / 2) - (bodyWidth / 2);
+        const offsetY = bounds.bottom - bodyHeight;
 
-        this.body.setSize(bodyWidth, bodyHeight);
+        this.body.setSize(bodyWidth, bodyHeight, false);
         this.body.setOffset(offsetX, offsetY);
+    }
+
+    getVisibleBounds() {
+        const visibleBounds = {
+            vaguetti: { left: 139, right: 253, top: 222, bottom: 421 },
+            vaguetti_frame_0: { left: 140, right: 260, top: 222, bottom: 399 },
+            vaguetti_frame_1: { left: 140, right: 252, top: 224, bottom: 402 },
+            vaguetti_frame_2: { left: 140, right: 260, top: 226, bottom: 403 },
+            vaguetti_frame_3: { left: 140, right: 265, top: 223, bottom: 395 },
+            vaguetti_frame_4: { left: 139, right: 251, top: 222, bottom: 394 },
+            vaguetti_frame_5: { left: 140, right: 257, top: 223, bottom: 398 }
+        };
+
+        return visibleBounds[this.texture.key] || visibleBounds.vaguetti;
+    }
+
+    getCombatPoint() {
+        const bounds = this.getVisibleBounds();
+        const centerX = (bounds.left + bounds.right) / 2;
+        const centerY = (bounds.top + bounds.bottom) / 2;
+
+        return {
+            x: this.x + this.scaleX * (centerX - this.displayOriginX),
+            y: this.y + this.scaleY * (centerY - this.displayOriginY)
+        };
     }
 
     updateVisualScale() {

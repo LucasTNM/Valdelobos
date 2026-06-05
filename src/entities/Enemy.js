@@ -29,39 +29,12 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         this.setOrigin(0.5, 1); // igual ao jogador para alinhamento de chão
 
-        // ===== CONFIGURAÇÃO DA HITBOX DO MONSTRO DA LUZ =====
-        // Tamanho e deslocamento do corpo de colisão
-        if (this.body) {
-            const hitboxSettings = {
-                light: {
-                    widthScale: 0.16,
-                    heightScale: 0.24,
-                    offsetXAdjustment: 0,
-                    offsetYAdjustment: 0
-                },
-                shadow: {
-                    widthScale: 0.28,
-                    heightScale: 0.58,
-                    offsetXAdjustment: 0,
-                    offsetYAdjustment: -20
-                }
-            };
-
-            const { widthScale, heightScale, offsetXAdjustment, offsetYAdjustment } = hitboxSettings[this.type] || hitboxSettings.shadow;
-            const bodyWidth = this.displayWidth * widthScale;
-            const bodyHeight = this.displayHeight * heightScale;
-            const offsetX = (this.displayWidth - bodyWidth) / 2 + offsetXAdjustment;
-            const offsetY = (this.displayHeight - bodyHeight) / 2 + offsetYAdjustment;
-
-            // setSize define o tamanho da hitbox
-            // setOffset define a posição do retângulo de colisão relativo ao sprite
-            this.body.setSize(bodyWidth, bodyHeight);
-            this.body.setOffset(offsetX, offsetY);
-        }
+        this.updateCollisionBox();
 
         // Barra de vida do inimigo
         this.healthBar = scene.add.graphics();
         this.healthBar.setDepth(104);
+        this.healthBar.setVisible(this.type !== 'light');
         this.updateHealthBar();
 
         // Debug visual de colisões
@@ -124,9 +97,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     update() {
         if (!this.active || !this.target) return;
 
+        const targetPoint = this.getTargetHitPoint();
+        const selfPoint = this.getSelfHitPoint();
         const distance = Phaser.Math.Distance.Between(
-            this.x, this.y,
-            this.target.x, this.target.y
+            selfPoint.x, selfPoint.y,
+            targetPoint.x, targetPoint.y
         );
 
         const playerIsVisible = this.target.fuel > 0 && this.target.isLightOn;
@@ -157,9 +132,19 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         // ========================
         // MOVIMENTO (com correção)
         // ========================
+        const canAttackTarget = this.canAttackTarget();
+        const approachPoint = this.getTargetApproachPoint(selfPoint, targetPoint);
+
         if (this.state === 'CHASE') {
-            if (distance > this.attackRange) {
-                this.scene.physics.moveToObject(this, this.target, this.speed);
+            if (!canAttackTarget) {
+                const angle = Phaser.Math.Angle.Between(
+                    selfPoint.x, selfPoint.y,
+                    approachPoint.x, approachPoint.y
+                );
+                this.setVelocity(
+                    Math.cos(angle) * this.speed,
+                    Math.sin(angle) * this.speed
+                );
             } else {
                 this.setVelocity(0); // evita orbitar
             }
@@ -168,8 +153,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             this.setRotation(Math.sin(this.scene.time.now * 0.01) * 0.1);
         } else if (this.state === 'FLEE') {
             const angle = Phaser.Math.Angle.Between(
-                this.target.x, this.target.y,
-                this.x, this.y
+                targetPoint.x, targetPoint.y,
+                selfPoint.x, selfPoint.y
             );
             this.setVelocity(
                 Math.cos(angle) * this.speed,
@@ -185,23 +170,23 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         // ========================
         // ATAQUE POR TIPO
         // ========================
-        if (this.type === 'light' && playerIsVisible && distance < this.attackRange) {
+        if (this.type === 'light' && playerIsVisible && canAttackTarget) {
             this.tryAttack();
         }
 
-        if (this.type === 'shadow' && !playerIsVisible && distance < this.attackRange) {
+        if (this.type === 'shadow' && !playerIsVisible && canAttackTarget) {
             this.tryAttack();
         }
 
         this.updateHealthBar();
         this.updateDebugGraphic();
 
-        if (this.target.isAttacking) {
+        if (this.type !== 'light' && this.target.isAttacking) {
             this.checkBeamHit();
         }
 
         // Checar se está dentro da área de luz da lanterna
-        if (this.target.isLightOn && this.target.fuel > 0) {
+        if (this.type !== 'light' && this.target.isLightOn && this.target.fuel > 0) {
             this.checkLanternLight();
         }
     }
@@ -209,7 +194,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     tryAttack() {
         const now = this.scene.time.now;
 
-        if (now - this.lastAttackTime > this.attackCooldown) {
+        if (this.canAttackTarget() && now - this.lastAttackTime > this.attackCooldown) {
             this.attack();
             this.lastAttackTime = now;
         }
@@ -217,6 +202,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     attack() {
         if (!this.target || !this.target.takeDamage) return;
+        if (!this.canAttackTarget()) return;
 
         this.target.takeDamage(20, this.type); // Aumentado de 10 para 20
 
@@ -229,20 +215,25 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     checkBeamHit() {
         const player = this.target;
+        const playerAttackX = player.x + (player.flipX ? -player.lightXOffset : player.lightXOffset);
+        const playerAttackY = player.y + player.lightYOffset;
+        const enemyHit = this.getSelfHitPoint();
+        const enemyHitX = enemyHit.x;
+        const enemyHitY = enemyHit.y;
 
         const angleToEnemy = Phaser.Math.Angle.Between(
-            player.x, player.y, // removido o -40
-            this.x, this.y - (this.displayHeight * 0.4) // centro vertical do inimigo
+            playerAttackX, playerAttackY,
+            enemyHitX, enemyHitY
         );
 
         const playerRotation = player.flipX ? Math.PI : 0;
         const diff = Phaser.Math.Angle.Normalize(angleToEnemy - playerRotation);
-        const threshold = 0.3;
+        const threshold = 0.55;
 
         if (Math.abs(diff) < threshold || Math.abs(diff - Math.PI * 2) < threshold) {
             const dist = Phaser.Math.Distance.Between(
-                player.x, player.y,
-                this.x, this.y
+                playerAttackX, playerAttackY,
+                enemyHitX, enemyHitY
             );
 
             if (dist < 400) {
@@ -253,7 +244,15 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     checkLanternLight() {
         const player = this.target;
-        const dist = Phaser.Math.Distance.Between(player.x + player.lightXOffset, player.y + player.lightYOffset, this.x, this.y);
+        const enemyHit = this.getSelfHitPoint();
+        const enemyHitX = enemyHit.x;
+        const enemyHitY = enemyHit.y;
+        const dist = Phaser.Math.Distance.Between(
+            player.x + player.lightXOffset,
+            player.y + player.lightYOffset,
+            enemyHitX,
+            enemyHitY
+        );
         
         // Se estiver dentro do raio de luz da lanterna
         if (dist < player.lightRadius) {
@@ -263,6 +262,12 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     updateHealthBar() {
         if (!this.active) return;
+
+        if (this.type === 'light') {
+            this.healthBar.clear();
+            this.healthBar.setVisible(false);
+            return;
+        }
 
         this.healthBar.clear();
 
@@ -274,6 +279,92 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         this.healthBar.fillStyle(barColor, 1);
         this.healthBar.fillRect(this.x - 20, this.y - 70, 40 * healthPercent, 6);
+    }
+
+    updateCollisionBox() {
+        if (!this.body) return;
+
+        const hitboxSettings = {
+            light: {
+                centerX: this.width / 2,
+                bottomY: this.height - 1,
+                widthScale: 0.5,
+                height: 8
+            },
+            shadow: {
+                centerX: 114,
+                bottomY: 196,
+                widthScale: 0.28,
+                height: 18
+            }
+        };
+
+        const { centerX, bottomY, widthScale, height } = hitboxSettings[this.type] || hitboxSettings.shadow;
+        const bodyWidth = this.width * widthScale;
+        const bodyHeight = height;
+        const offsetX = centerX - (bodyWidth / 2);
+        const offsetY = bottomY - bodyHeight;
+
+        this.body.setSize(bodyWidth, bodyHeight, false);
+        this.body.setOffset(offsetX, offsetY);
+    }
+
+    canAttackTarget(maxX = 34, maxY = 38) {
+        if (!this.body || !this.target?.body) return false;
+
+        const a = this.getSelfHitPoint();
+        const b = this.getTargetHitPoint();
+        const approachPoint = this.getTargetApproachPoint(a, b);
+
+        return Math.abs(a.x - approachPoint.x) <= maxX && Math.abs(a.y - approachPoint.y) <= maxY;
+    }
+
+    getSelfHitPoint() {
+        const combatSettings = {
+            light: {
+                centerX: this.width / 2,
+                centerY: this.height * 0.5
+            },
+            shadow: {
+                centerX: 114,
+                centerY: 140
+            }
+        };
+
+        const { centerX, centerY } = combatSettings[this.type] || combatSettings.shadow;
+
+        return {
+            x: this.x + this.scaleX * (centerX - this.displayOriginX),
+            y: this.y + this.scaleY * (centerY - this.displayOriginY)
+        };
+    }
+
+    getTargetHitPoint() {
+        if (this.target?.getCombatPoint) {
+            return this.target.getCombatPoint();
+        }
+
+        if (!this.target?.body) {
+            return { x: this.target?.x || this.x, y: this.target?.y || this.y };
+        }
+
+        return {
+            x: this.target.body.center.x,
+            y: this.target.body.center.y
+        };
+    }
+
+    getTargetApproachPoint(selfPoint = this.getSelfHitPoint(), targetPoint = this.getTargetHitPoint()) {
+        if (!this.attackSide || Math.abs(selfPoint.x - targetPoint.x) > 120) {
+            this.attackSide = selfPoint.x < targetPoint.x ? -1 : 1;
+        }
+
+        const sideOffset = this.type === 'light' ? 58 : 66;
+
+        return {
+            x: targetPoint.x + this.attackSide * sideOffset,
+            y: targetPoint.y
+        };
     }
 
     updateDebugGraphic() {
@@ -293,6 +384,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     takeDamage(amount) {
+        if (this.type === 'light') return;
+
         this.health -= amount;
         this.updateHealthBar();
 
