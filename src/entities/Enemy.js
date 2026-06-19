@@ -181,7 +181,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.updateHealthBar();
         this.updateDebugGraphic();
 
-        if (this.type !== 'light' && this.target.isAttacking) {
+        // Verifica ataque do jogador (feixe) para todos os tipos
+        if (this.target.isAttacking) {
             this.checkBeamHit();
         }
 
@@ -384,8 +385,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     takeDamage(amount) {
-        if (this.type === 'light') return;
-
         this.health -= amount;
         this.updateHealthBar();
 

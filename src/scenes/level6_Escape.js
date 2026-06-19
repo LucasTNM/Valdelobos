@@ -13,6 +13,7 @@ export default class Level6_Escape extends Phaser.Scene {
     preload() {
         this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
         this.load.image('dark_forest', './assets/dark_forest.png');
+        this.load.image('querosene', './assets/querosene.png');
     }
 
     create() {
@@ -45,6 +46,9 @@ export default class Level6_Escape extends Phaser.Scene {
         // Grupo de Inimigos
         this.enemies = this.physics.add.group({ runChildUpdate: true });
         this.spawnEnemies(w, h);
+
+        // Itens: Frascos de Querosene (reutiliza lógica do Level4_Camp)
+        this.createFuelItems && this.createFuelItems(w, h);
 
         // UI
         const titleSize = Math.max(24, screenWidth / 25);
@@ -86,6 +90,62 @@ export default class Level6_Escape extends Phaser.Scene {
             enemy.setDepth(10);
             this.enemies.add(enemy);
         }
+    }
+
+    createFuelItems(w, h) {
+        this.fuelGroup = this.physics.add.group();
+        const fuelPositions = [600, 1000, 1500];
+        
+        fuelPositions.forEach(x => {
+            const fuelImg = this.add.image(0, 0, 'querosene');
+            fuelImg.setScale(0.5);
+            
+            const aura = this.add.image(0, 0, 'light_mask');
+            aura.setScale(0.2);
+            aura.setTint(0x00ffff);
+            aura.setAlpha(0.3);
+            
+            const container = this.add.container(x, h * 0.7, [aura, fuelImg]);
+            this.physics.add.existing(container);
+            this.fuelGroup.add(container);
+            
+            this.tweens.add({
+                targets: container,
+                y: h * 0.68,
+                duration: 1200,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
+
+            this.tweens.add({
+                targets: aura,
+                scale: 0.25,
+                alpha: 0.1,
+                duration: 1200,
+                yoyo: true,
+                repeat: -1
+            });
+        });
+
+        this.physics.add.overlap(this.player, this.fuelGroup, (p, fuel) => {
+            fuel.destroy();
+            this.player.fuel = Math.min(this.player.maxFuel, this.player.fuel + 30);
+            
+            const txt = this.add.text(this.player.x, this.player.y - 50, '+30 QUEROSENE', {
+                fontSize: '14px',
+                color: '#00ffff'
+            }).setOrigin(0.5).setAlpha(1).setDepth(100);
+            
+            this.tweens.add({
+                targets: txt,
+                y: this.player.y - 100,
+                alpha: 0,
+                duration: 1000,
+                onComplete: () => txt.destroy()
+            });
+        });
+
     }
 
     handlePlayerDamage(enemy) {
