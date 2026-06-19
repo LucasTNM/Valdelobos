@@ -77,6 +77,7 @@ export default class Level6_Escape extends Phaser.Scene {
         this.isTransitioning = true;
         this.cameras.main.fade(500, 0, 0, 0);
         this.time.delayedCall(500, () => {
+            // Após a fuga, ir para LoreScene antes de seguir para a estrada
             this.scene.start('Level6_Road');
         });
     }
