@@ -24,16 +24,15 @@ export function showDialogue(scene, text, duration = 4000, fadeDuration = 800) {
     .setOrigin(0.5)
     .setDepth(1000);
 
-    // Fundo inicial
+    // Fundo removido visualmente: manter retângulo invisível para sizing/fade
     const dialogBg = scene.add.rectangle(
         screenWidth / 2,
         yPosition,
         maxWidth,
         90,
         0x000000,
-        0.88
+        0
     )
-    .setStrokeStyle(2, 0xffffff)
     .setOrigin(0.5)
     .setDepth(999);
 
