@@ -60,9 +60,9 @@ export default class FishingScene extends Phaser.Scene {
 
         showDialogue(this, 'DEVO ME SENTAR NO PIER PARA PESCAR.');
 
-        this.time.delayedCall(20000, () => {
-            this.cameras.main.fadeOut(2500, 0, 0, 0);
-            this.time.delayedCall(2500, () => {
+        this.time.delayedCall(10000, () => {
+            this.cameras.main.fadeOut(1000, 0, 0, 0);
+            this.time.delayedCall(1000, () => {
                 this.scene.start('FishingScene_Night', {
                     wasFishing: true,
                     playerState: {

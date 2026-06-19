@@ -107,7 +107,9 @@ export default class FishingScene_Night extends Phaser.Scene {
                 this.standUp();
                 this.cameras.main.fadeOut(1500, 0, 0, 0);
                 this.time.delayedCall(1500, () => {
-                    this.scene.start('Level4_Camp');
+                    this.scene.start('LoreScene', {
+                        nextScene: 'Level4_Camp'
+                    });
                 });
             });
 

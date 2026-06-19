@@ -2,10 +2,12 @@ import Phaser from 'phaser';
 import BootScene from './scenes/BootScene';
 import MenuScene from './scenes/MenuScene';
 import IntroScene from './scenes/IntroScene';
+import LoreScene from './scenes/LoreScene';
 import Level1_Arrival from './scenes/Level1_Arrival';
 import FishingScene from './scenes/FishingScene';
 import FishingScene_Night from './scenes/FishingScene_Night';
 import Level4_Camp from './scenes/Level4_Camp';
+import FinalScene from './scenes/Final';
 import Level5_DarkForest from './scenes/Level5_DarkForest';
 import Level6_Road from './scenes/Level6_Road';
 import Level6_Escape from './scenes/level6_Escape';
@@ -38,9 +40,11 @@ const config = {
         Level1_Arrival,
         FishingScene,
         FishingScene_Night,
+        LoreScene,
         Level4_Camp,
         Level5_DarkForest,
         Level6_Road,
+        FinalScene,
         Level6_Escape,
         JumpScareScene,
         GameOver

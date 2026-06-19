@@ -307,7 +307,7 @@ export default class Level6_Road extends Phaser.Scene {
         }).setOrigin(0.5).setScrollFactor(0).setDepth(200);
 
         this.time.delayedCall(3000, () => {
-            this.scene.start('MenuScene');
+            this.scene.start('FinalScene');
         });
     }
 

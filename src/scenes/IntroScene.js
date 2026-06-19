@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import { playAmbient } from '../utils/ambientAudio';
+// CUIDADO: Verifique se o caminho do seu import do audio está correto no seu projeto
+// import { playAmbient } from '../utils/ambientAudio';
 
 export default class IntroScene extends Phaser.Scene {
     constructor() {
@@ -14,8 +15,8 @@ export default class IntroScene extends Phaser.Scene {
 
         console.log('IntroScene create() initialized');
 
-        // Áudio ambiente da floresta
-        playAmbient(this, 'floresta', 0.06);
+        // Áudio ambiente da floresta (descomente/ajuste conforme seu utils)
+        // playAmbient(this, 'floresta', 0.06);
 
         // Configurar áudio da moto
         this.motoSound = null;
@@ -35,27 +36,52 @@ export default class IntroScene extends Phaser.Scene {
         // Fundo escuro para a introdução
         this.add.graphics().fillStyle(0x000000, 1).fillRect(0, 0, w, h);
 
-        // Texto da premissa
-        const premiseText = this.add.text(centerX, centerY - 100, 
-            'O motociclista Leandro Vaguetti viaja até a remota floresta de Valdelobos\npara uma pescaria, mas se vê preso em um pesadelo quando o sol se põe.\n\nImerso em uma escuridão absoluta, ele descobre que a floresta é habitada\npor criaturas mortais: algumas atraídas pela luz, outras caçadoras das sombras.\n\nArmado apenas com um lampião a querosene, Leandro precisa racionar\nseu combustível em uma fuga desesperada.\n\nPara sobreviver à noite e alcançar sua moto, ele terá que dominar o equilíbrio\nentre iluminar seu caminho e se esconder no breu.',
-            {
-                fontFamily: 'Arial, sans-serif',
-                fontSize: '18px',
-                color: '#FFFFFF',
-                align: 'center',
-                wordWrap: { width: w * 0.8 }
-            }
-        ).setOrigin(0.5).setDepth(10);
+        // Cria o texto vazio primeiro (Será preenchido pelo n8n)
+        this.premiseText = this.add.text(centerX, centerY - 100, 'Carregando arquivos de Valdelobos...', {
+            fontFamily: 'Arial, sans-serif',
+            fontSize: '18px',
+            color: '#FFFFFF',
+            align: 'center',
+            wordWrap: { width: w * 0.8 }
+        }).setOrigin(0.5).setDepth(10);
 
-        // Animação de fade in do texto
-        premiseText.setAlpha(0);
+        this.premiseText.setAlpha(0);
+
+        // Chama a função que busca o texto do n8n
+        this.fetchIntroFromN8n();
+    }
+
+    async fetchIntroFromN8n() {
+        const n8nUrl = 'https://n8n.incluc0de.com.br/webhook/narrador';
+        
+        // Texto de Fallback (Plano B) caso o n8n caia
+        let finalIntroText = 'O motociclista Leandro Vaguetti viaja até a remota floresta de Valdelobos\npara uma pescaria, mas se vê preso em um pesadelo quando o sol se põe.\n\nImerso em uma escuridão absoluta, ele descobre que a floresta é habitada\npor criaturas mortais: algumas atraídas pela luz, outras caçadoras das sombras.\n\nArmado apenas com um lampião a querosene, Leandro precisa racionar\nseu combustível em uma fuga desesperada.\n\nPara sobreviver à noite e alcançar sua moto, ele terá que dominar o equilíbrio\nentre iluminar seu caminho e se esconder no breu.';
+
+        try {
+            const response = await fetch(n8nUrl);
+            
+            if (response.ok) {
+                const data = await response.json();
+                // Verifica se a chave "intro" existe no JSON
+                if (typeof data?.intro === 'string' && data.intro.trim().length > 0) {
+                    finalIntroText = data.intro;
+                }
+            }
+        } catch (error) {
+            console.warn("n8n offline ou bloqueado na Intro. Usando texto de fallback.", error);
+        }
+
+        // Aplica o texto carregado (ou o fallback)
+        this.premiseText.setText(finalIntroText);
+
+        // Inicia a animação de Fade In
         this.tweens.add({
-            targets: premiseText,
+            targets: this.premiseText,
             alpha: 1,
             duration: 2000
         });
 
-        // Após 8 segundos, iniciar a sequência visual
+        // AGORA SIM, após 8 segundos que o texto apareceu, iniciar a sequência visual
         this.time.delayedCall(8000, () => {
             console.log('Calling showArrivalSequence');
             try {
@@ -197,13 +223,13 @@ export default class IntroScene extends Phaser.Scene {
                     this.cameras.main.fade(1500, 0, 0, 0, false);
                     
                     this.time.delayedCall(1600, () => {
-                        console.log('Transitioning to Level1_Arrival scene');
+                        console.log('Transitioning to Level1_Arrival');
                         try {
                             // Stop any active animations to prevent conflicts
                             this.tweens.killAll();
                             this.scene.start('Level1_Arrival');
                         } catch (error) {
-                            console.error('Error starting Level1_Arrival scene:', error);
+                            console.error('Error starting Level1_Arrival:', error);
                             // Fallback: try starting by scene key
                             this.scene.stop('IntroScene');
                             this.scene.start('Level1_Arrival');
