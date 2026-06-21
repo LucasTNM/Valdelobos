@@ -86,6 +86,12 @@ export default class FishingScene_Night extends Phaser.Scene {
             if (this.player.scaleX) {
                 this.fishingSprite.setScale(this.player.scaleX * 0.8);
             }
+
+            // Aplicar o mesmo ajuste X usado na cena diurna para manter alinhamento
+            if (this.fishingSprite) {
+                const adjust = this.scale.width * 0.02;
+                this.fishingSprite.x -= adjust;
+            }
         }
 
         this.cameras.main.setBounds(0, 0, screenWidth, screenHeight);

@@ -93,7 +93,9 @@ export default class FishingScene extends Phaser.Scene {
         this.player.beam.setVisible(false);
         this.player.setPosition(spot.x, spot.y + spot.sitOffsetY);
 
-        this.fishingSprite = this.add.image(spot.x, spot.y, 'sprite_pescador')
+        // Ajuste leve na posição X para alinhar o sprite do pescador ao local de pesca
+        const adjustedX = spot.x - (this.scale.width * 0.02);
+        this.fishingSprite = this.add.image(adjustedX, spot.y, 'sprite_pescador')
             .setOrigin(0.5, 0.5)
             .setDepth(15);
 

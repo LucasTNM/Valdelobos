@@ -162,12 +162,19 @@ export default class Level4_Camp extends Phaser.Scene {
     }
 
     spawnEnemies(w, h) {
+        // Garantir que os spawns fiquem dentro dos limites do mundo, mesmo em telas estreitas
+        const minX = Math.max(100, 200);
+        const maxX = Math.max(minX + 100, w - 100);
         for (let i = 0; i < 5; i++) {
-            const x = 500 + Math.random() * (w - 600);
+            const x = minX + Math.random() * (maxX - minX);
             const type = i < 2 || Math.random() < 0.65 ? 'light' : 'shadow';
             const tex = type === 'light' ? 'enemy_light_tex' : 'enemy_shadow_tex';
             const enemy = new Enemy(this, x, h * 0.7, tex, type);
             enemy.setDepth(10);
+            // Garantir hitbox atualizado e aplicar pequeno aumento de velocidade/perseguição
+            if (enemy.updateCollisionBox) enemy.updateCollisionBox();
+            enemy.speedMultiplier = 1.12; // 12% mais rápido nesta fase
+            enemy.chaseDistance = (enemy.chaseDistance || 600) * 1.15; // 15% mais alcance de perseguição
             this.enemies.add(enemy);
         }
     }

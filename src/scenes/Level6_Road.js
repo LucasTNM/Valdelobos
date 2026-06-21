@@ -80,13 +80,26 @@ export default class Level6_Road extends Phaser.Scene {
         // Itens: Frascos de Querosene (reutiliza lógica do Level4_Camp)
         this.createFuelItems && this.createFuelItems(w, h);
 
-        // Iniciar spawn de inimigos após o jogador andar um pouco
+        // Iniciar spawn de inimigos imediatamente ao iniciar a fase
         this.time.addEvent({
-            delay: 5000,
+            delay: 0,
             callback: () => {
                 if (!this.enemySpawned && !this.isEnding) {
                     this.enemySpawned = true;
                     this.startEnemyWave();
+                }
+            }
+        });
+
+        // Manter spawn ativo durante toda a fase final
+        this.time.addEvent({
+            delay: 4500,
+            loop: true,
+            callback: () => {
+                if (!this.isEnding) {
+                    const directions = ['behind-top', 'behind-bottom', 'top', 'bottom'];
+                    const direction = Phaser.Math.RND.pick(directions);
+                    this.spawnEnemy(direction);
                 }
             }
         });
@@ -115,10 +128,11 @@ export default class Level6_Road extends Phaser.Scene {
     startEnemyWave() {
         // Onda 1: Inimigos vindo de trás
         this.time.addEvent({
-            delay: 500,
+            delay: 0,
             callback: () => {
                 this.spawnEnemy('behind-top');
                 this.spawnEnemy('behind-bottom');
+                this.spawnEnemy('behind-top');
             }
         });
 
@@ -130,6 +144,7 @@ export default class Level6_Road extends Phaser.Scene {
                 this.spawnEnemy('behind-bottom');
                 this.spawnEnemy('top');
                 this.spawnEnemy('bottom');
+                this.spawnEnemy('behind-top');
             }
         });
 
@@ -142,6 +157,7 @@ export default class Level6_Road extends Phaser.Scene {
                 this.spawnEnemy('behind-top');
                 this.spawnEnemy('behind-bottom');
                 this.spawnEnemy('behind-top');
+                this.spawnEnemy('top');
             }
         });
 
@@ -152,6 +168,7 @@ export default class Level6_Road extends Phaser.Scene {
                 this.spawnEnemy('top');
                 this.spawnEnemy('bottom');
                 this.spawnEnemy('behind-top');
+                this.spawnEnemy('behind-bottom');
             }
         });
     }

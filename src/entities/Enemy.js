@@ -10,6 +10,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.setCollideWorldBounds(false); // Desativar colisão com bordas do mundo
         this.speed = type === 'light' ? 80 : 120;
         this.attackRange = type === 'light' ? 200 : 250;
+        // per-instance tuning (scenes can adjust these without changing AI)
+        this.baseSpeed = this.speed;
+        this.speedMultiplier = 1;
+        this.chaseDistance = this.type === 'light' ? 600 : 1200;
         this.lastAttackTime = 0;
         this.attackCooldown = 1000;
         this.maxHealth = 60;
@@ -111,7 +115,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         // ========================
         if (this.type === 'light') {
             // Só age com luz acesa
-            if (playerIsVisible && distance < 600) {
+            if (playerIsVisible && distance < (this.chaseDistance || 600)) {
                 this.state = 'CHASE';
             } else {
                 this.state = 'IDLE';
@@ -120,7 +124,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             // ===== COMPORTAMENTO DO MONSTRO DA ESCURIDÃO =====
             // Luz ligada -> fugir
             // Luz desligada -> perseguir
-            if (!playerIsVisible && distance < 1200) {
+            if (!playerIsVisible && distance < (this.chaseDistance || 1200)) {
                 this.state = 'CHASE';
             } else if (playerIsVisible) {
                 this.state = 'FLEE';
@@ -141,9 +145,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
                     selfPoint.x, selfPoint.y,
                     approachPoint.x, approachPoint.y
                 );
+                const effectiveSpeed = (this.baseSpeed || this.speed) * (this.speedMultiplier || 1);
                 this.setVelocity(
-                    Math.cos(angle) * this.speed,
-                    Math.sin(angle) * this.speed
+                    Math.cos(angle) * effectiveSpeed,
+                    Math.sin(angle) * effectiveSpeed
                 );
             } else {
                 this.setVelocity(0); // evita orbitar
@@ -156,9 +161,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
                 targetPoint.x, targetPoint.y,
                 selfPoint.x, selfPoint.y
             );
+            const effectiveSpeed = (this.baseSpeed || this.speed) * (this.speedMultiplier || 1);
             this.setVelocity(
-                Math.cos(angle) * this.speed,
-                Math.sin(angle) * this.speed
+                Math.cos(angle) * effectiveSpeed,
+                Math.sin(angle) * effectiveSpeed
             );
             this.setFlipX(this.body.velocity.x < 0);
             this.setRotation(Math.sin(this.scene.time.now * 0.01) * 0.1);
@@ -285,23 +291,26 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     updateCollisionBox() {
         if (!this.body) return;
 
+        const sourceWidth = this.width || this.displayWidth || 1;
+        const sourceHeight = this.height || this.displayHeight || 1;
+
         const hitboxSettings = {
             light: {
-                centerX: this.width / 2,
-                bottomY: this.height - 1,
+                centerX: sourceWidth * 0.5,
+                bottomY: sourceHeight - 1,
                 widthScale: 0.5,
-                height: 8
+                height: Math.max(8, sourceHeight * 0.12)
             },
             shadow: {
-                centerX: 114,
-                bottomY: 196,
-                widthScale: 0.28,
-                height: 18
+                centerX: sourceWidth * 0.5,
+                bottomY: sourceHeight * 0.9,
+                widthScale: 0.35,
+                height: Math.max(12, sourceHeight * 0.12)
             }
         };
 
         const { centerX, bottomY, widthScale, height } = hitboxSettings[this.type] || hitboxSettings.shadow;
-        const bodyWidth = this.width * widthScale;
+        const bodyWidth = sourceWidth * widthScale;
         const bodyHeight = height;
         const offsetX = centerX - (bodyWidth / 2);
         const offsetY = bottomY - bodyHeight;
@@ -321,14 +330,17 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     getSelfHitPoint() {
+        const sourceWidth = this.width || this.displayWidth || 1;
+        const sourceHeight = this.height || this.displayHeight || 1;
+
         const combatSettings = {
             light: {
-                centerX: this.width / 2,
-                centerY: this.height * 0.5
+                centerX: sourceWidth * 0.5,
+                centerY: sourceHeight * 0.5
             },
             shadow: {
-                centerX: 114,
-                centerY: 140
+                centerX: sourceWidth * 0.5,
+                centerY: sourceHeight * 0.7
             }
         };
 
