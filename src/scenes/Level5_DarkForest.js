@@ -83,12 +83,19 @@ export default class Level5_DarkForest extends Phaser.Scene {
     }
 
     spawnEnemies(w, h) {
+        // Garantir spawns dentro dos limites do mundo para evitar valores negativos
+        const minX = 150;
+        const maxX = Math.max(minX + 100, w - 150);
         for (let i = 0; i < 5; i++) {
-            const x = 500 + Math.random() * (w - 900);
+            const x = minX + Math.random() * (maxX - minX);
             const type = i === 0 || Math.random() < 0.55 ? 'light' : 'shadow';
             const tex = type === 'light' ? 'enemy_light_tex' : 'enemy_shadow_tex';
             const enemy = new Enemy(this, x, h * 0.7, tex, type);
             enemy.setDepth(10);
+            // Garantir hitbox atualizado e aplicar pequeno aumento de velocidade/perseguição
+            if (enemy.updateCollisionBox) enemy.updateCollisionBox();
+            enemy.speedMultiplier = 1.12; // 12% mais rápido nesta fase
+            enemy.chaseDistance = (enemy.chaseDistance || (type === 'light' ? 600 : 1200)) * 1.15; // 15% mais alcance de perseguição
             this.enemies.add(enemy);
         }
     }

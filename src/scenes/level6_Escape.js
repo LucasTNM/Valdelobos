@@ -47,6 +47,22 @@ export default class Level6_Escape extends Phaser.Scene {
         this.enemies = this.physics.add.group({ runChildUpdate: true });
         this.spawnEnemies(w, h);
 
+        // Manter spawn ativo durante toda a fase final
+        this.time.addEvent({
+            delay: 5000,
+            loop: true,
+            callback: () => {
+                if (!this.isTransitioning) {
+                    const x = w * 0.2 + Math.random() * (w * 0.55);
+                    const type = Math.random() < 0.55 ? 'light' : 'shadow';
+                    const tex = type === 'light' ? 'enemy_light_tex' : 'enemy_shadow_tex';
+                    const enemy = new Enemy(this, x, h * 0.7, tex, type);
+                    enemy.setDepth(10);
+                    this.enemies.add(enemy);
+                }
+            }
+        });
+
         // Itens: Frascos de Querosene (reutiliza lógica do Level4_Camp)
         this.createFuelItems && this.createFuelItems(w, h);
 
@@ -83,7 +99,7 @@ export default class Level6_Escape extends Phaser.Scene {
     }
 
     spawnEnemies(w, h) {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 7; i++) {
             const x = w * 0.2 + Math.random() * (w * 0.55);
             const type = i === 0 || Math.random() < 0.55 ? 'light' : 'shadow';
             const tex = type === 'light' ? 'enemy_light_tex' : 'enemy_shadow_tex';

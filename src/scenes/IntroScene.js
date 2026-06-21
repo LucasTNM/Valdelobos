@@ -1,6 +1,4 @@
 import Phaser from 'phaser';
-// CUIDADO: Verifique se o caminho do seu import do audio está correto no seu projeto
-// import { playAmbient } from '../utils/ambientAudio';
 
 export default class IntroScene extends Phaser.Scene {
     constructor() {
@@ -15,8 +13,6 @@ export default class IntroScene extends Phaser.Scene {
 
         console.log('IntroScene create() initialized');
 
-        // Áudio ambiente da floresta (descomente/ajuste conforme seu utils)
-        // playAmbient(this, 'floresta', 0.06);
 
         // Configurar áudio da moto
         this.motoSound = null;

@@ -129,7 +129,7 @@ export default class MenuScene extends Phaser.Scene {
         // Ajustar escala e espaçamento se estiver no modo debug
         let buttonScale = Math.max(0.8, this.scale.width / 1200);
         let spacing = Math.max(70, this.scale.height / 8);
-        let startY = centerY * 0.7;
+        let startY = centerY * 0.82;
 
         if (this.debugMode) {
             buttonScale *= 0.6; // Reduz a escala em 40%
