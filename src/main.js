@@ -17,7 +17,7 @@ import GameOver from './scenes/GameOver';
 const config = {
     type: Phaser.AUTO,
     scale: {
-        mode: Phaser.Scale.RESIZE, // Redimensiona com a janela
+        mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: window.innerWidth,
         height: window.innerHeight,
@@ -51,11 +51,9 @@ const config = {
     ]
 };
 
-// Inicializa o jogo
 const game = new Phaser.Game(config);
 game.debugMode = false;
 
-// Redimensiona o jogo quando a janela mudar de tamanho
 window.addEventListener('resize', () => {
     game.scale.resize(window.innerWidth, window.innerHeight);
 });

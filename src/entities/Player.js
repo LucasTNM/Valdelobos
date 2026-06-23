@@ -3,64 +3,53 @@ import Phaser from 'phaser';
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
         super(scene, x, y, 'vaguetti');
-        
-        // Adicionar o jogador à cena e habilitar física
+
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
-        // Configurações de física
         this.setCollideWorldBounds(true);
         this.setOrigin(0.5, 1);
-        
-        // Ajustar hitbox do player para ser mais precisa
+
         this.updateCollisionBox();
-        
-        // Velocidade de movimento
+
         this.speed = 200;
 
-        // Atributos do Jogador
         this.maxFuel = 100;
         this.fuel = 100;
         this.maxHealth = 100;
         this.health = 100;
         this.isInvincible = false;
-        this.fuelConsumptionRate = 3.0; // Aumentado de 1.5 para 3.0
-        this.attackConsumptionRate = 20; // Aumentado de 10 para 20
+        this.fuelConsumptionRate = 3.0;
+        this.attackConsumptionRate = 20;
         this.isAttacking = false;
-        this.isLightOn = false; // Novo estado: lampião ligado/desligado
-        
-        // Armazenar a posição Y original para correto posicionamento da luz
+        this.isLightOn = false;
+
         this.baseY = y;
-        // Offsets para o lampião - calibrado para escala 0.7
-        this.lightYOffset = -260; // Para cima
-        this.lightXOffset = 50;   // Para frente
-        
-        // Luz do Lampião (Cor âmbar/quente)
+
+        this.lightYOffset = -260;
+        this.lightXOffset = 50;
+
         this.lightRadius = 200;
         this.light = scene.add.image(x + this.lightXOffset, y + this.lightYOffset, 'light_mask');
         this.light.setDisplaySize(this.lightRadius * 2, this.lightRadius * 2);
         this.light.setAlpha(0.6);
-        this.light.setTint(0xffcc66); // Cor âmbar de lampião
-        this.light.setBlendMode(Phaser.BlendModes.SCREEN); // SCREEN costuma dar um efeito melhor para luzes quentes
+        this.light.setTint(0xffcc66);
+        this.light.setBlendMode(Phaser.BlendModes.SCREEN);
         this.light.setDepth(this.depth + 1);
 
-        // Feixe de Luz (Ataque)
         this.beam = scene.add.image(x, y, 'light_beam');
         this.beam.setOrigin(0, 0.5);
         this.beam.setAlpha(0);
-        this.beam.setTint(0xffaa44); // Feixe mais alaranjado/quente
+        this.beam.setTint(0xffaa44);
         this.beam.setBlendMode(Phaser.BlendModes.ADD);
         this.beam.setDepth(this.depth + 2);
 
-        // Barra de combustível (UI simples que segue)
         this.fuelBar = scene.add.graphics();
         this.updateFuelBar();
 
-        // Debug visual de colisões
         this.debugBody = scene.add.graphics();
         this.debugBody.setDepth(1000);
 
-        // Teclas de controle
         this.cursors = scene.input.keyboard.createCursorKeys();
         this.wasd = scene.input.keyboard.addKeys({
             up: Phaser.Input.Keyboard.KeyCodes.W,
@@ -70,20 +59,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             toggleLight: Phaser.Input.Keyboard.KeyCodes.F
         });
 
-        // Áudio de passos do jogador
         this.stepSound = scene.sound.add('passo', {
             loop: true,
             volume: 0.18
         });
 
-        // Áudio do lampião (liga/desliga)
         this.lampSound = scene.sound.add('lamp', {
             loop: false,
             volume: 0.18,
             allowMultiple: false
         });
 
-        // Flag para controlar animação
         this.isAnimationPlaying = false;
 
         this.on('destroy', () => {
@@ -98,7 +84,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     update() {
-        // Alternar lampião (Tecla F)
+
         if (Phaser.Input.Keyboard.JustDown(this.wasd.toggleLight)) {
             this.toggleLight();
         }
@@ -112,11 +98,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             }
             return;
         }
-        
-        // Verificar se há movimento
+
         let isMoving = false;
-        
-        // Movimentação horizontal
+
         if (this.cursors.left.isDown || this.wasd.left.isDown) {
             this.setVelocityX(-this.speed);
             this.setFlipX(true);
@@ -129,7 +113,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setVelocityX(0);
         }
 
-        // Movimentação vertical (opcional para exploração)
         if (this.cursors.up.isDown || this.wasd.up.isDown) {
             this.setVelocityY(-this.speed);
             isMoving = true;
@@ -140,7 +123,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setVelocityY(0);
         }
 
-        // Áudio de passos: tocar em loop apenas quando estiver andando
         if (isMoving) {
             if (this.stepSound && !this.stepSound.isPlaying) {
                 this.stepSound.play();
@@ -149,10 +131,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.stepSound.stop();
         }
 
-        // Controlar animação com base no movimento
         if (isMoving) {
             if (!this.isAnimationPlaying) {
-                this.setTexture('vaguetti_frame_0'); // Trocar para primeira frame da animação
+                this.setTexture('vaguetti_frame_0');
                 this.updateCollisionBox();
                 this.play('vaguetti_walk');
                 this.isAnimationPlaying = true;
@@ -160,21 +141,19 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         } else {
             if (this.isAnimationPlaying) {
                 this.stop();
-                this.setTexture('vaguetti'); // Voltar à imagem default
+                this.setTexture('vaguetti');
                 this.updateCollisionBox();
                 this.isAnimationPlaying = false;
             }
         }
 
-        // Lógica de Ataque (Espaço) - Somente se a luz estiver ligada e houver combustível
         if (this.cursors.space.isDown && this.fuel > 0 && this.isLightOn) {
             this.isAttacking = true;
             this.beam.setAlpha(0.8);
             this.beam.setX(this.x + this.lightXOffset);
-            this.beam.setY(this.y + this.lightYOffset); // Usar o mesmo offset que a luz
+            this.beam.setY(this.y + this.lightYOffset);
             this.beam.setRotation(this.flipX ? Math.PI : 0);
-            
-            // Faíscas ao atacar
+
             if (Math.random() > 0.6) {
                 const sparkColor = Math.random() > 0.5 ? 0xffaa00 : 0xffff00;
                 const spark = this.scene.add.circle(this.beam.x, this.beam.y, 2, sparkColor);
@@ -193,14 +172,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 });
             }
 
-            // Consumo extra ao atacar
-            this.fuel -= (this.attackConsumptionRate / 60); 
+            this.fuel -= (this.attackConsumptionRate / 60);
         } else {
             this.isAttacking = false;
             this.beam.setAlpha(0);
         }
 
-        // Consumo passivo de querosene (Somente se ligado)
         if (this.fuel > 0 && this.isLightOn) {
             this.fuel -= (this.fuelConsumptionRate / 60);
         } else if (this.fuel <= 0) {
@@ -214,7 +191,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.beam.setAlpha(0);
         }
 
-        // Atualizar brilho baseado no querosene (Somente se ligado)
         if (this.fuel > 0 && this.isLightOn) {
             const flicker = Math.random() * 0.05;
             this.light.setAlpha(0.4 + (this.fuel / this.maxFuel) * 0.4 + flicker);
@@ -227,7 +203,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         const scaledLightX = this.lightXOffset * this.scaleX;
         const scaledLightY = this.lightYOffset * this.scaleY;
 
-        // Atualizar posições dos efeitos
         this.light.setPosition(this.x + scaledLightX, this.y + scaledLightY);
         this.beam.setX(this.x + scaledLightX);
         this.beam.setY(this.y + scaledLightY);
@@ -332,63 +307,56 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (!this.active) return;
 
         this.fuelBar.clear();
-        
-        // Posição da barra ajustada para escala
+
         const barOffsetY = -180;
         const barWidth = 80;
         const barHeight = 12;
         const barX = this.x - 40;
         const barY = this.y + barOffsetY;
-        
-        // Borda externa (moldura)
+
         this.fuelBar.lineStyle(2, 0x000000, 0.8);
         this.fuelBar.strokeRect(barX, barY, barWidth, barHeight);
-        
-        // Fundo das barras (mais escuro)
+
         this.fuelBar.fillStyle(0x1a1a1a, 0.8);
         this.fuelBar.fillRect(barX, barY, barWidth, barHeight);
-        
-        // Barra de Vida (Verde brilhante)
+
         const healthPercent = Math.max(0, this.health / this.maxHealth);
         this.fuelBar.fillStyle(0x00ff00, 1);
         this.fuelBar.fillRect(barX + 2, barY + 2, (barWidth - 4) * healthPercent, (barHeight / 2) - 2);
-        
-        // Borda interna da barra de vida
+
         this.fuelBar.lineStyle(1, 0x008800, 0.6);
         this.fuelBar.strokeRect(barX + 2, barY + 2, (barWidth - 4) * healthPercent, (barHeight / 2) - 2);
 
-        // Barra de Combustível (Ciano/Cinza/Vermelho com gradiente de cor)
         const fuelPercent = Math.max(0, this.fuel / this.maxFuel);
         let fuelColor;
-        
+
         if (fuelPercent > 0.5) {
-            fuelColor = 0x00ffff; // Ciano - bom
+            fuelColor = 0x00ffff;
         } else if (fuelPercent > 0.2) {
-            fuelColor = 0xffaa00; // Laranja - cuidado
+            fuelColor = 0xffaa00;
         } else {
-            fuelColor = 0xff0000; // Vermelho - crítico
+            fuelColor = 0xff0000;
         }
-        
+
         this.fuelBar.fillStyle(fuelColor, 1);
         this.fuelBar.fillRect(barX + 2, barY + (barHeight / 2), (barWidth - 4) * fuelPercent, (barHeight / 2) - 2);
-        
-        // Borda interna da barra de combustível
+
         this.fuelBar.lineStyle(1, 0x008888, 0.6);
         this.fuelBar.strokeRect(barX + 2, barY + (barHeight / 2), (barWidth - 4) * fuelPercent, (barHeight / 2) - 2);
     }
 
     takeDamage(amount, attackerType) {
         if (this.isInvincible || this.health <= 0) return;
-        
+
         this.health -= amount;
         this.isInvincible = true;
         this.setTint(0xff0000);
         this.scene.cameras.main.shake(100, 0.01);
-        
+
         if (this.health <= 0) {
             this.health = 0;
             this.updateFuelBar();
-            // Notificar a cena para o Game Over ou jumpscare
+
             if (this.scene.gameOver) {
                 this.scene.gameOver(attackerType);
             }
@@ -405,20 +373,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     toggleLight() {
         if (this.fuel > 0) {
             this.isLightOn = !this.isLightOn;
-            
-            // Efeito visual imediato de ligar/desligar
+
             if (!this.isLightOn) {
                 this.light.setAlpha(0);
                 this.isAttacking = false;
                 this.beam.setAlpha(0);
             }
 
-            // Som de ligar/desligar lampião
             if (this.lampSound) {
                 this.lampSound.play();
             }
-            
-            // Som de clique (feedback visual por enquanto)
+
             const text = this.isLightOn ? 'LUZ LIGADA' : 'LUZ DESLIGADA';
             const color = this.isLightOn ? '#ffff00' : '#888888';
             const feedback = this.scene.add.text(this.x, this.y - 80, text, {
@@ -426,7 +391,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 color: color,
                 fontStyle: 'bold'
             }).setOrigin(0.5).setDepth(110);
-            
+
             this.scene.tweens.add({
                 targets: feedback,
                 y: feedback.y - 40,

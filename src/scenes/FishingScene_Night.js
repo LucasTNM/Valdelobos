@@ -20,9 +20,6 @@ export default class FishingScene_Night extends Phaser.Scene {
         const screenWidth = this.scale.width;
         const screenHeight = this.scale.height;
 
-        // ===== POSIÇÃO DO PESCADOR =====
-        // Coordenadas sincronizadas com FishingScene
-        // Agora usa os mesmos valores fixos do FishingScene para alinhar os spots.
         this.fishingSpotConfig = {
             x: screenWidth * 0.66,
             y: screenHeight * 0.48,
@@ -62,7 +59,6 @@ export default class FishingScene_Night extends Phaser.Scene {
         this.player.beam.setDepth(12);
         this.player.fuelBar.setDepth(13);
 
-        // Manter o estado de pesca da cena anterior se ela estiver sendo iniciada em continuidade
         const previousState = this.scene.settings.data || {};
         if (previousState.wasFishing) {
             if (previousState.playerState) {
@@ -87,7 +83,6 @@ export default class FishingScene_Night extends Phaser.Scene {
                 this.fishingSprite.setScale(this.player.scaleX * 0.8);
             }
 
-            // Aplicar o mesmo ajuste X usado na cena diurna para manter alinhamento
             if (this.fishingSprite) {
                 const adjust = this.scale.width * 0.02;
                 this.fishingSprite.x -= adjust;
@@ -100,7 +95,7 @@ export default class FishingScene_Night extends Phaser.Scene {
             if (!this.sustoSound) {
                 this.sustoSound = this.sound.add('susto', {
                     loop: false,
-                    // Volume do susto: ajuste aqui para reduzir o nível sem perder o impacto.
+
                     volume: 0.27
                 });
             }
@@ -164,8 +159,7 @@ export default class FishingScene_Night extends Phaser.Scene {
             .setDepth(15);
 
         if (this.player.scaleX) {
-            // Ajuste a escala do sprite de pesca aqui com setScale().
-            // Aumente ou diminua o multiplicador para combinar com o tamanho do player.
+
             this.fishingSprite.setScale(this.player.scaleX * 0.8);
         }
     }

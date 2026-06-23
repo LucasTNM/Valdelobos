@@ -6,38 +6,31 @@ export default class BootScene extends Phaser.Scene {
     }
 
     preload() {
-        // Carregar a imagem do personagem
+
         this.load.image('tela_inicial', './assets/tela_inicial.png');
-        
-        // Carregar frames de animação do Vaguetti (sprites 1-6 são animação, sprite 7 é default)
+
         this.load.image('vaguetti_frame_0', './assets/Vaguetti/sprite_vaguettev2_fundoremovido1.png');
         this.load.image('vaguetti_frame_1', './assets/Vaguetti/sprite_vaguettev2_fundoremovido2.png');
         this.load.image('vaguetti_frame_2', './assets/Vaguetti/sprite_vaguettev2_fundoremovido3.png');
         this.load.image('vaguetti_frame_3', './assets/Vaguetti/sprite_vaguettev2_fundoremovido4.png');
         this.load.image('vaguetti_frame_4', './assets/Vaguetti/sprite_vaguettev2_fundoremovido5.png');
         this.load.image('vaguetti_frame_5', './assets/Vaguetti/sprite_vaguettev2_fundoremovido6.png');
-        
-        // Imagem estática para fallback (sprite 7 é o default)
+
         this.load.image('vaguetti', './assets/Vaguetti/sprite_vaguettev2_fundoremovido7.png');
 
-        // Monstros principais:
-        // skeleton-walk é sprite sheet 192x48 (4 frames 48x48)
         this.load.spritesheet('enemy_light_tex', './assets/skeleton-walk.png', {
             frameWidth: 48,
             frameHeight: 48
         });
 
-        // sprite_transparente.gif é gif animado (armazenado como imagem estática em alguns casos)
         this.load.image('enemy_shadow_tex', './assets/sprite_transparente.gif');
 
-        // Assets gerais de fase
         this.load.image('estrada_pixel_art', './assets/estrada_pixel_art.png');
         this.load.image('bg_dark_forest', './assets/forest/vegetation/dark%20forest.png');
         this.load.image('moto_foda', './assets/moto_foda.png');
         this.load.image('sprite_motoqueiro', './assets/Vaguetti/sprite_motoqueiro.png');
         this.load.image('sprite_pescador', './assets/Vaguetti/sprite_pescador.png');
 
-        // Áudio do jogo
         this.load.audio('passo', './assets/audio/sfx/passo.mp3');
         this.load.audio('moto', './assets/audio/sfx/moto.mp3');
         this.load.audio('floresta', './assets/audio/sfx/floresta.mp3');
@@ -46,7 +39,6 @@ export default class BootScene extends Phaser.Scene {
         this.load.audio('susto', './assets/audio/sfx/susto.mp3');
         this.load.audio('lamp', './assets/audio/sfx/lamp.mp3');
 
-        // Jumpscare assets
         this.load.video('jumpscare_white', './assets/videos/jumpscare_white_mp4.mp4', 'loadeddata', false, true);
         this.load.audio('jumpscare_white', './assets/audio/music/jumpscare_white_mp3.mp3');
         this.load.video('jumpscare_black', './assets/videos/jumpscare_black_mp4.mp4', 'loadeddata', false, true);
@@ -55,18 +47,16 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('fishing_scene', './assets/fishing-scene.png');
         this.load.image('pesca_night', './assets/pesca_night.png');
 
-        // Árvores animadas do Lost Pixel Art
         this.load.image('tree_1_1', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 1.png');
         this.load.image('tree_1_2', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 2.png');
         this.load.image('tree_1_3', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 3.png');
         this.load.image('tree_1_4', './assets/Lost Pixel Art - Forest/Trees/Tree_1 - 4.png');
-        
+
         this.load.image('tree_2_1', './assets/Lost Pixel Art - Forest/Trees/Tree_2 - 1.png');
         this.load.image('tree_2_2', './assets/Lost Pixel Art - Forest/Trees/Tree_2 - 2.png');
         this.load.image('tree_2_3', './assets/Lost Pixel Art - Forest/Trees/Tree_2 - 3.png');
         this.load.image('tree_2_4', './assets/Lost Pixel Art - Forest/Trees/Tree_2 - 4.png');
 
-        // Flores animadas
         this.load.image('flower_1_1', './assets/Flowers/Flower_1 - 1.png');
         this.load.image('flower_1_2', './assets/Flowers/Flower_1 - 2.png');
         this.load.image('flower_1_3', './assets/Flowers/Flower_1 - 3.png');
@@ -87,11 +77,9 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('flower_4_3', './assets/Flowers/Flower_4 - 3.png');
         this.load.image('flower_4_4', './assets/Flowers/Flower_4 - 4.png');
 
-        // Arbustos
         this.load.image('bush_1', './assets/Bushes/Bush - 1.png');
         this.load.image('bush_2', './assets/Bushes/Bush - 2.png');
 
-        // Grama animada
         this.load.image('grass_1', './assets/Grass/Grass - 1.png');
         this.load.image('grass_2', './assets/Grass/Grass - 2.png');
         this.load.image('grass_3', './assets/Grass/Grass - 3.png');
@@ -106,21 +94,15 @@ export default class BootScene extends Phaser.Scene {
 
     create() {
         this.createGameTextures();
-        
-        // Tela de splash com a imagem - RESPONSIVO E FULLSCREEN
+
         const centerX = this.scale.width / 2;
         const centerY = this.scale.height / 2;
 
-        // Adicionar a imagem de fundo cobrindo toda a tela
         const telaInicial = this.add.image(0, 0, 'tela_inicial');
         telaInicial.setOrigin(0, 0);
         telaInicial.setDisplaySize(this.scale.width, this.scale.height);
         telaInicial.setDepth(0);
 
-        // Adicionar sombra sob o personagem (opcional - pode remover se a imagem de fundo é suficiente)
-        // this.add.graphics().fillStyle(0x000000, 0.5).fillEllipse(centerX, centerY + 100, 120, 30);
-
-        // Título do jogo - ajustado para a tela
         const titleSize = Math.max(32, this.scale.width / 20);
         this.add.text(centerX, centerY + 150, 'SOBREVIVÊNCIA', {
             fontFamily: 'Arial, sans-serif',
@@ -145,7 +127,6 @@ export default class BootScene extends Phaser.Scene {
             fontStyle: 'italic'
         }).setOrigin(0.5).setDepth(1);
 
-        // Mensagem de clique
         const clickText = this.add.text(centerX, centerY + 280, 'Pressione ENTER ou CLIQUE para continuar', {
             fontFamily: 'Arial, sans-serif',
             fontSize: (titleSize * 0.35) + 'px',
@@ -153,7 +134,6 @@ export default class BootScene extends Phaser.Scene {
             align: 'center'
         }).setOrigin(0.5).setDepth(1);
 
-        // Animação de pulsação do texto
         this.tweens.add({
             targets: clickText,
             alpha: { from: 0.3, to: 1 },
@@ -162,24 +142,21 @@ export default class BootScene extends Phaser.Scene {
             yoyo: true
         });
 
-        // Interatividade - teclado
         this.input.keyboard.once('keydown-ENTER', () => {
             this.startIntro();
         });
 
-        // Interatividade - mouse
         this.input.once('pointerdown', () => {
             this.startIntro();
         });
     }
 
     startIntro() {
-        // Verifica se já está em tela cheia; se não estiver, solicita a entrada.
+
         if (!this.scale.isFullscreen) {
             this.scale.startFullscreen();
         }
 
-        // Continua a transição de cena normalmente
         this.cameras.main.fade(300, 0, 0, 0);
         this.time.delayedCall(300, () => {
             this.scene.start('MenuScene');
@@ -187,21 +164,20 @@ export default class BootScene extends Phaser.Scene {
     }
 
     createGameTextures() {
-        // Textura do gradiente de luz do lampião
+
         const size = 256;
         const canvas = this.textures.createCanvas('light_mask', size, size);
         const ctx = canvas.getContext();
-        
+
         const gradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
         gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
         gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.8)');
         gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        
+
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, size, size);
         canvas.refresh();
 
-        // Criar spritesheet do Vaguetti combinando os frames de animação
         if (!this.anims.exists('vaguetti_walk')) {
             this.anims.create({
                 key: 'vaguetti_walk',
@@ -218,7 +194,6 @@ export default class BootScene extends Phaser.Scene {
             });
         }
 
-        // Criar animações globais para inimigos
         if (!this.anims.exists('enemy_light_walk')) {
             this.anims.create({
                 key: 'enemy_light_walk',
@@ -229,7 +204,7 @@ export default class BootScene extends Phaser.Scene {
         }
 
         if (!this.anims.exists('enemy_shadow_idle')) {
-            // Caso o GIF de sombra não seja animado em Phaser, mantém um frame estático.
+
             this.anims.create({
                 key: 'enemy_shadow_idle',
                 frames: [{ key: 'enemy_shadow_tex', frame: null }],
@@ -238,7 +213,6 @@ export default class BootScene extends Phaser.Scene {
             });
         }
 
-        // Animações das árvores
         if (!this.anims.exists('tree_1_sway')) {
             this.anims.create({
                 key: 'tree_1_sway',
@@ -267,7 +241,6 @@ export default class BootScene extends Phaser.Scene {
             });
         }
 
-        // Animações das flores
         if (!this.anims.exists('flower_1_bloom')) {
             this.anims.create({
                 key: 'flower_1_bloom',
@@ -324,7 +297,6 @@ export default class BootScene extends Phaser.Scene {
             });
         }
 
-        // Animações da grama
         if (!this.anims.exists('grass_sway')) {
             this.anims.create({
                 key: 'grass_sway',
@@ -339,17 +311,16 @@ export default class BootScene extends Phaser.Scene {
             });
         }
 
-        // Textura do feixe de luz (Ataque)
         const beamW = 400;
         const beamH = 100;
         const beamCanvas = this.textures.createCanvas('light_beam', beamW, beamH);
         const beamCtx = beamCanvas.getContext();
-        
+
         const beamGrad = beamCtx.createRadialGradient(0, beamH/2, 0, 0, beamH/2, beamW);
         beamGrad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
         beamGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.4)');
         beamGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        
+
         beamCtx.fillStyle = beamGrad;
         beamCtx.beginPath();
         beamCtx.moveTo(0, beamH * 0.4);
@@ -360,7 +331,6 @@ export default class BootScene extends Phaser.Scene {
         beamCtx.fill();
         beamCanvas.refresh();
 
-        // Textura de partícula (fumaça/névoa)
         const particleSize = 32;
         const pCanvas = this.textures.createCanvas('smoke', particleSize, particleSize);
         const pCtx = pCanvas.getContext();

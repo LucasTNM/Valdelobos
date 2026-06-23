@@ -6,7 +6,6 @@ export function showDialogue(scene, text, duration = 4000, fadeDuration = 800) {
     const maxWidth = Math.min(900, screenWidth * 0.9);
     const yPosition = screenHeight - 140;
 
-    // Texto começa vazio
     const dialogText = scene.add.text(
         screenWidth / 2,
         yPosition,
@@ -24,7 +23,6 @@ export function showDialogue(scene, text, duration = 4000, fadeDuration = 800) {
     .setOrigin(0.5)
     .setDepth(1000);
 
-    // Fundo removido visualmente: manter retângulo invisível para sizing/fade
     const dialogBg = scene.add.rectangle(
         screenWidth / 2,
         yPosition,
@@ -46,7 +44,6 @@ export function showDialogue(scene, text, duration = 4000, fadeDuration = 800) {
     dialogText.setScrollFactor(0);
     container.setScrollFactor(0);
 
-    // Fade In
     container.setAlpha(0);
 
     scene.tweens.add({
@@ -55,10 +52,6 @@ export function showDialogue(scene, text, duration = 4000, fadeDuration = 800) {
         duration: 400,
         ease: 'Power2'
     });
-
-    // =========================
-    // EFEITO DIGITANDO
-    // =========================
 
     let currentText = '';
     let index = 0;
@@ -72,7 +65,6 @@ export function showDialogue(scene, text, duration = 4000, fadeDuration = 800) {
 
             index++;
 
-            // Ajusta tamanho da caixa dinamicamente
             const bounds = dialogText.getBounds();
 
             dialogBg.width = bounds.width + padding * 2;
@@ -80,7 +72,6 @@ export function showDialogue(scene, text, duration = 4000, fadeDuration = 800) {
         }
     });
 
-    // Fade Out
     scene.time.delayedCall(duration, () => {
         scene.tweens.add({
             targets: container,

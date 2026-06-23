@@ -7,7 +7,7 @@ export default class Level6_Road extends Phaser.Scene {
     constructor() {
         super('Level6_Road');
         this.lastDamageTime = 0;
-        this.damageCooldown = 1000; // 1 segundo entre danos
+        this.damageCooldown = 1000;
     }
 
     preload() {
@@ -25,12 +25,10 @@ export default class Level6_Road extends Phaser.Scene {
         const w = this.scale.width;
         const h = this.scale.height;
 
-        // Aumentar o mundo para acomodar movimento para frente (5x o background)
         const worldWidth = w * 5;
         const worldHeight = h;
         this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
 
-        // Fundo: Road repetido 5 vezes
         for (let i = 0; i < 5; i++) {
             this.add.image(i * w, 0, 'road')
                 .setOrigin(0, 0)
@@ -38,23 +36,19 @@ export default class Level6_Road extends Phaser.Scene {
                 .setDepth(-1);
         }
 
-        // Player
         this.player = new Player(this, 150, h * 0.7);
         const vaguettiScale = Math.min(h / 600, 1) * 0.7;
         this.player.setScale(vaguettiScale);
 
-        // Áudio ambiente noturno
         playAmbient(this, 'noite', 0.08);
         this.player.setDepth(10);
         this.player.light.setDepth(101);
         this.player.beam.setDepth(102);
         this.player.fuelBar.setDepth(103);
 
-        // Câmera segue o jogador
         this.cameras.main.startFollow(this.player);
         this.cameras.main.setBounds(0, 0, worldWidth, worldHeight);
 
-        // A Moto (Objetivo Final) - no final da estrada
         this.motoContainer = this.add.container(worldWidth * 0.75, h * 0.7);
         this.motoImg = this.add.image(0, 0, 'moto');
         this.motoImg.setScale(0.6);
@@ -62,7 +56,6 @@ export default class Level6_Road extends Phaser.Scene {
         this.physics.add.existing(this.motoContainer, true);
         this.motoContainer.setDepth(15);
 
-        // Áudio da moto objetivo
         this.motoSound = this.sound.add('moto', {
             loop: true,
             volume: 0.35
@@ -74,13 +67,10 @@ export default class Level6_Road extends Phaser.Scene {
             }
         });
 
-        // Inimigos Perseguidores
         this.enemies = this.physics.add.group({ runChildUpdate: true });
 
-        // Itens: Frascos de Querosene (reutiliza lógica do Level4_Camp)
         this.createFuelItems && this.createFuelItems(w, h);
 
-        // Iniciar spawn de inimigos imediatamente ao iniciar a fase
         this.time.addEvent({
             delay: 0,
             callback: () => {
@@ -91,7 +81,6 @@ export default class Level6_Road extends Phaser.Scene {
             }
         });
 
-        // Manter spawn ativo durante toda a fase final
         this.time.addEvent({
             delay: 4500,
             loop: true,
@@ -104,7 +93,6 @@ export default class Level6_Road extends Phaser.Scene {
             }
         });
 
-        // UI
         const titleSize = Math.max(24, w / 25);
         this.add.text(w * 0.5, h * 0.1, 'A ESTRADA DE FUGA', {
             fontFamily: 'Arial, sans-serif',
@@ -119,14 +107,13 @@ export default class Level6_Road extends Phaser.Scene {
             color: '#FF4444'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(200);
 
-        // Lógica de Vitória
         this.physics.add.overlap(this.player, this.motoContainer, () => {
             this.victory();
         });
     }
 
     startEnemyWave() {
-        // Onda 1: Inimigos vindo de trás
+
         this.time.addEvent({
             delay: 0,
             callback: () => {
@@ -136,7 +123,6 @@ export default class Level6_Road extends Phaser.Scene {
             }
         });
 
-        // Onda 2: Mais inimigos vindo de trás + inimigos dos lados
         this.time.addEvent({
             delay: 3000,
             callback: () => {
@@ -148,7 +134,6 @@ export default class Level6_Road extends Phaser.Scene {
             }
         });
 
-        // Onda 3: Ataque intenso de várias direções
         this.time.addEvent({
             delay: 6000,
             callback: () => {
@@ -161,7 +146,6 @@ export default class Level6_Road extends Phaser.Scene {
             }
         });
 
-        // Onda 4: Perseguição final
         this.time.addEvent({
             delay: 10000,
             callback: () => {
@@ -185,22 +169,22 @@ export default class Level6_Road extends Phaser.Scene {
 
         switch (direction) {
             case 'behind-top':
-                // De trás, na parte superior
+
                 spawnX = this.player.x - 600 + Math.random() * 400;
                 spawnY = h * 0.4;
                 break;
             case 'behind-bottom':
-                // De trás, na parte inferior
+
                 spawnX = this.player.x - 600 + Math.random() * 400;
                 spawnY = h * 0.6;
                 break;
             case 'top':
-                // De cima
+
                 spawnX = this.player.x - 200 + Math.random() * 400;
                 spawnY = h * 0.2;
                 break;
             case 'bottom':
-                // De baixo
+
                 spawnX = this.player.x - 200 + Math.random() * 400;
                 spawnY = h * 0.8;
                 break;
@@ -214,20 +198,20 @@ export default class Level6_Road extends Phaser.Scene {
     createFuelItems(w, h) {
         this.fuelGroup = this.physics.add.group();
         const fuelPositions = [600, 1000, 1500];
-        
+
         fuelPositions.forEach(x => {
             const fuelImg = this.add.image(0, 0, 'querosene');
             fuelImg.setScale(0.5);
-            
+
             const aura = this.add.image(0, 0, 'light_mask');
             aura.setScale(0.2);
             aura.setTint(0x00ffff);
             aura.setAlpha(0.3);
-            
+
             const container = this.add.container(x, h * 0.7, [aura, fuelImg]);
             this.physics.add.existing(container);
             this.fuelGroup.add(container);
-            
+
             this.tweens.add({
                 targets: container,
                 y: h * 0.68,
@@ -250,12 +234,12 @@ export default class Level6_Road extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.fuelGroup, (p, fuel) => {
             fuel.destroy();
             this.player.fuel = Math.min(this.player.maxFuel, this.player.fuel + 30);
-            
+
             const txt = this.add.text(this.player.x, this.player.y - 50, '+30 QUEROSENE', {
                 fontSize: '14px',
                 color: '#00ffff'
             }).setOrigin(0.5).setAlpha(1).setDepth(100);
-            
+
             this.tweens.add({
                 targets: txt,
                 y: this.player.y - 100,
@@ -270,18 +254,15 @@ export default class Level6_Road extends Phaser.Scene {
     victory() {
         if (this.isEnding) return;
         this.isEnding = true;
-        
-        // Fazer a câmera parar de seguir o player
+
         this.cameras.main.stopFollow();
-        
-        // Destruir inimigos restantes
+
         this.enemies.clear(true, true);
-        
+
         const w = this.scale.width;
         const h = this.scale.height;
         const worldWidth = w * 5;
-        
-        // Animar o player e a moto saindo da tela para FRENTE (aumentando X)
+
         this.tweens.add({
             targets: this.player,
             x: worldWidth * 0.9,
@@ -294,7 +275,7 @@ export default class Level6_Road extends Phaser.Scene {
                 this.player.setVisible(true);
             }
         });
-        
+
         this.tweens.add({
             targets: this.motoContainer,
             x: worldWidth * 0.95,
@@ -333,17 +314,15 @@ export default class Level6_Road extends Phaser.Scene {
             return;
         }
 
-        // Verificar cooldown para não dar dano múltiplas vezes rapidamente
         const now = this.time.now;
         if (now - this.lastDamageTime < this.damageCooldown) {
             return;
         }
 
         this.lastDamageTime = now;
-        
-        // Inimigo de sombra só causa dano se a luz estiver desligada
+
         if (enemy.type === 'shadow' && this.player.isLightOn) {
-            return; // Não causa dano
+            return;
         }
         this.player.takeDamage(25, enemy.type);
     }

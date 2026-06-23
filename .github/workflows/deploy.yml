@@ -1,11 +1,9 @@
-# .github/workflows/deploy.yml
 name: Deploy do Jogo para o GitHub Pages
 
 on:
   push:
     branches: ['main']
 
-# Configura as permissões para o GitHub Pages
 permissions:
   contents: read
   pages: write
@@ -42,7 +40,7 @@ jobs:
       - name: Fazer Upload dos arquivos do Build
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist' # O Vite gera o jogo final nesta pasta
+          path: './dist'
 
       - name: Publicar no GitHub Pages
         id: deployment

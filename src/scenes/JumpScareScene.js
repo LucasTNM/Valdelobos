@@ -21,7 +21,6 @@ export default class JumpScareScene extends Phaser.Scene {
         const config = JUMPSCARE_CONFIG[type] || JUMPSCARE_CONFIG.light;
         const { width, height } = this.scale;
 
-        // Garantir que não exista áudio residual de outras cenas.
         this.sound.stopAll();
 
         this.jumpscareSound = this.sound.add(config.audioKey, { loop: false, volume: 1 });

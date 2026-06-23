@@ -20,8 +20,6 @@ export default class FishingScene extends Phaser.Scene {
         const screenWidth = this.scale.width;
         const screenHeight = this.scale.height;
 
-        // Coordenadas e tamanho da área de pesca.
-        // Ajuste x, y, width, height e sitOffsetY aqui para reposicionar o spot.
         this.fishingSpotConfig = {
             x: screenWidth * 0.66,
             y: screenHeight * 0.48,
@@ -29,7 +27,6 @@ export default class FishingScene extends Phaser.Scene {
             height: screenHeight * 0.09,
             sitOffsetY: 0
         };
-
 
         this.fishingSpot = this.add.zone(this.fishingSpotConfig.x, this.fishingSpotConfig.y, this.fishingSpotConfig.width, this.fishingSpotConfig.height)
             .setOrigin(0.5)
@@ -44,7 +41,6 @@ export default class FishingScene extends Phaser.Scene {
 
         this.physics.world.setBounds(0, 0, screenWidth, screenHeight);
 
-        // Áudio ambiente da floresta
         playAmbient(this, 'floresta', 0.08);
 
         this.player = new Player(this, screenWidth * 0.75, screenHeight * 0.25);
@@ -93,15 +89,13 @@ export default class FishingScene extends Phaser.Scene {
         this.player.beam.setVisible(false);
         this.player.setPosition(spot.x, spot.y + spot.sitOffsetY);
 
-        // Ajuste leve na posição X para alinhar o sprite do pescador ao local de pesca
         const adjustedX = spot.x - (this.scale.width * 0.02);
         this.fishingSprite = this.add.image(adjustedX, spot.y, 'sprite_pescador')
             .setOrigin(0.5, 0.5)
             .setDepth(15);
 
         if (this.player.scaleX) {
-            // Ajuste a escala do sprite de pesca aqui com setScale().
-            // Aumente ou diminua o multiplicador para combinar com o tamanho do player.
+
             this.fishingSprite.setScale(this.player.scaleX * 0.8);
         }
     }

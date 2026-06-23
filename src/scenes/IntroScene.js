@@ -13,8 +13,6 @@ export default class IntroScene extends Phaser.Scene {
 
         console.log('IntroScene create() initialized');
 
-
-        // Configurar áudio da moto
         this.motoSound = null;
         this.events.once('shutdown', () => {
             if (this.motoSound) {
@@ -23,16 +21,13 @@ export default class IntroScene extends Phaser.Scene {
             }
         });
 
-        // Timeout de segurança para evitar ficar preso na intro (20 segundos)
         this.safetyTimeout = this.time.delayedCall(20000, () => {
             console.warn('IntroScene safety timeout triggered - forcing transition to Level1_Arrival');
             this.forceTransitionToFishing();
         });
 
-        // Fundo escuro para a introdução
         this.add.graphics().fillStyle(0x000000, 1).fillRect(0, 0, w, h);
 
-        // Cria o texto vazio primeiro (Será preenchido pelo n8n)
         this.premiseText = this.add.text(centerX, centerY - 100, 'Carregando arquivos de Valdelobos...', {
             fontFamily: 'Arial, sans-serif',
             fontSize: '18px',
@@ -43,22 +38,20 @@ export default class IntroScene extends Phaser.Scene {
 
         this.premiseText.setAlpha(0);
 
-        // Chama a função que busca o texto do n8n
         this.fetchIntroFromN8n();
     }
 
     async fetchIntroFromN8n() {
         const n8nUrl = 'https://n8n.incluc0de.com.br/webhook/narrador';
-        
-        // Texto de Fallback (Plano B) caso o n8n caia
+
         let finalIntroText = 'O motociclista Leandro Vaguetti viaja até a remota floresta de Valdelobos\npara uma pescaria, mas se vê preso em um pesadelo quando o sol se põe.\n\nImerso em uma escuridão absoluta, ele descobre que a floresta é habitada\npor criaturas mortais: algumas atraídas pela luz, outras caçadoras das sombras.\n\nArmado apenas com um lampião a querosene, Leandro precisa racionar\nseu combustível em uma fuga desesperada.\n\nPara sobreviver à noite e alcançar sua moto, ele terá que dominar o equilíbrio\nentre iluminar seu caminho e se esconder no breu.';
 
         try {
             const response = await fetch(n8nUrl);
-            
+
             if (response.ok) {
                 const data = await response.json();
-                // Verifica se a chave "intro" existe no JSON
+
                 if (typeof data?.intro === 'string' && data.intro.trim().length > 0) {
                     finalIntroText = data.intro;
                 }
@@ -67,17 +60,14 @@ export default class IntroScene extends Phaser.Scene {
             console.warn("n8n offline ou bloqueado na Intro. Usando texto de fallback.", error);
         }
 
-        // Aplica o texto carregado (ou o fallback)
         this.premiseText.setText(finalIntroText);
 
-        // Inicia a animação de Fade In
         this.tweens.add({
             targets: this.premiseText,
             alpha: 1,
             duration: 2000
         });
 
-        // AGORA SIM, após 8 segundos que o texto apareceu, iniciar a sequência visual
         this.time.delayedCall(8000, () => {
             console.log('Calling showArrivalSequence');
             try {
@@ -100,12 +90,10 @@ export default class IntroScene extends Phaser.Scene {
 
         console.log('showArrivalSequence started');
 
-        // Limpar texto anterior
         this.children.getAll().forEach(child => {
             if (child.type === 'Text') child.destroy();
         });
 
-        // Fundo da floresta (usando uma imagem existente ou placeholder)
         try {
             const forestBg = this.add.image(0, 0, 'estrada_pixel_art');
             forestBg.setOrigin(0, 0);
@@ -114,11 +102,10 @@ export default class IntroScene extends Phaser.Scene {
             console.log('Forest background loaded');
         } catch (error) {
             console.error('Error loading forest background:', error);
-            // Fallback: fundo de cor
+
             this.add.graphics().fillStyle(0x1a3a2a, 1).fillRect(0, 0, w, h).setDepth(0);
         }
 
-        // Moto chegando da esquerda
         try {
             if (!this.motoSound) {
                 this.motoSound = this.sound.add('moto', {
@@ -131,7 +118,6 @@ export default class IntroScene extends Phaser.Scene {
             moto.setScale(0.6);
             moto.setDepth(5);
 
-            // Animação da moto entrando
             this.tweens.add({
                 targets: moto,
                 x: w * 0.3,
@@ -154,18 +140,16 @@ export default class IntroScene extends Phaser.Scene {
             console.error('Error with moto animation:', error);
         }
 
-        // Vaguetti na moto (inicialmente invisível)
         try {
             const vaguetti = this.add.sprite(w * 0.3, h * 0.7 - 50, 'vaguetti');
             vaguetti.setScale(1.0);
             vaguetti.setDepth(6);
             vaguetti.setAlpha(0);
 
-            // Após a moto parar, mostrar Vaguetti
             this.time.delayedCall(3000, () => {
                 console.log('Showing Vaguetti');
                 vaguetti.setAlpha(1);
-                // Vaguetti desce da moto
+
                 this.tweens.add({
                     targets: vaguetti,
                     y: h * 0.75,
@@ -187,46 +171,40 @@ export default class IntroScene extends Phaser.Scene {
 
         console.log('walkToFishingSpot started');
 
-        // Iniciar animação de caminhada
         try {
             vaguetti.play('vaguetti_walk');
         } catch (error) {
             console.warn('Animation vaguetti_walk not found:', error);
         }
 
-        // Caminhar para a direita até o local de pesca
         this.tweens.add({
             targets: vaguetti,
             x: w * 0.7,
             duration: 4000,
             onComplete: () => {
                 console.log('Walking animation completed');
-                
-                // Parar de andar
-                vaguetti.stop();
-                vaguetti.setTexture('vaguetti'); // Voltar à imagem estática
 
-                // Após alguns segundos, transição para o jogo
+                vaguetti.stop();
+                vaguetti.setTexture('vaguetti');
+
                 this.time.delayedCall(3000, () => {
                     console.log('Iniciando fade to black');
-                    
-                    // Cancelar timeout de segurança
+
                     if (this.safetyTimeout) {
                         this.safetyTimeout.remove();
                     }
-                    
-                    // Usar câmera fade integrada do Phaser
+
                     this.cameras.main.fade(1500, 0, 0, 0, false);
-                    
+
                     this.time.delayedCall(1600, () => {
                         console.log('Transitioning to Level1_Arrival');
                         try {
-                            // Stop any active animations to prevent conflicts
+
                             this.tweens.killAll();
                             this.scene.start('Level1_Arrival');
                         } catch (error) {
                             console.error('Error starting Level1_Arrival:', error);
-                            // Fallback: try starting by scene key
+
                             this.scene.stop('IntroScene');
                             this.scene.start('Level1_Arrival');
                         }

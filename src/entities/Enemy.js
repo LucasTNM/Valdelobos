@@ -6,11 +6,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
-        this.type = type; // 'light' ou 'shadow'
-        this.setCollideWorldBounds(false); // Desativar colisão com bordas do mundo
+        this.type = type;
+        this.setCollideWorldBounds(false);
         this.speed = type === 'light' ? 80 : 120;
         this.attackRange = type === 'light' ? 200 : 250;
-        // per-instance tuning (scenes can adjust these without changing AI)
+
         this.baseSpeed = this.speed;
         this.speedMultiplier = 1;
         this.chaseDistance = this.type === 'light' ? 600 : 1200;
@@ -19,33 +19,29 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.maxHealth = 60;
         this.health = 60;
 
-        // Ajustar escala baseando no tamanho do jogador para ficar equivalente
         if (scene.player && scene.player.height > 0 && this.height > 0) {
             const heroDisplayHeight = scene.player.height * scene.player.scaleY;
-            const targetHeight = heroDisplayHeight * 0.5; // reduzido para 50% do herói
+            const targetHeight = heroDisplayHeight * 0.5;
             const baseScale = targetHeight / this.height;
             const typeScale = this.type === 'light' ? 0.85 : 1;
             this.setScale(baseScale * typeScale);
         } else {
             const typeScale = this.type === 'light' ? 0.85 : 1;
-            this.setScale(0.8 * typeScale); // fallback menor também
+            this.setScale(0.8 * typeScale);
         }
 
-        this.setOrigin(0.5, 1); // igual ao jogador para alinhamento de chão
+        this.setOrigin(0.5, 1);
 
         this.updateCollisionBox();
 
-        // Barra de vida do inimigo
         this.healthBar = scene.add.graphics();
         this.healthBar.setDepth(104);
         this.healthBar.setVisible(this.type !== 'light');
         this.updateHealthBar();
 
-        // Debug visual de colisões
         this.debugBody = scene.add.graphics();
         this.debugBody.setDepth(1000);
 
-        // Áudio de monstros compartilhado por cena
         if (!scene.monsterSound) {
             scene.monsterSound = scene.sound.add('monstro', {
                 loop: true,
@@ -81,21 +77,16 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             }
         });
 
-        // Estados: IDLE, CHASE, ATTACK
         this.state = 'IDLE';
         this.target = scene.player;
 
         if (this.type === 'light') {
             this.play('enemy_light_walk');
         } else {
-            // Dependendo do gif, o Phaser pode não animar automaticamente; mantenha o frame
+
             this.play('enemy_shadow_idle');
         }
 
-        // Não tint para sprites detalhadas. Mantém original dos PNGs.
-        // Se quiser depuração de tipo, ative o tint abaixo:
-        // this.tintValue = type === 'light' ? 0xffaaaa : 0x5555ff;
-        // this.setTint(this.tintValue);
     }
 
     update() {
@@ -110,20 +101,15 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         const playerIsVisible = this.target.fuel > 0 && this.target.isLightOn;
 
-        // ========================
-        // IA
-        // ========================
         if (this.type === 'light') {
-            // Só age com luz acesa
+
             if (playerIsVisible && distance < (this.chaseDistance || 600)) {
                 this.state = 'CHASE';
             } else {
                 this.state = 'IDLE';
             }
         } else {
-            // ===== COMPORTAMENTO DO MONSTRO DA ESCURIDÃO =====
-            // Luz ligada -> fugir
-            // Luz desligada -> perseguir
+
             if (!playerIsVisible && distance < (this.chaseDistance || 1200)) {
                 this.state = 'CHASE';
             } else if (playerIsVisible) {
@@ -133,9 +119,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             }
         }
 
-        // ========================
-        // MOVIMENTO (com correção)
-        // ========================
         const canAttackTarget = this.canAttackTarget();
         const approachPoint = this.getTargetApproachPoint(selfPoint, targetPoint);
 
@@ -151,7 +134,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
                     Math.sin(angle) * effectiveSpeed
                 );
             } else {
-                this.setVelocity(0); // evita orbitar
+                this.setVelocity(0);
             }
 
             this.setFlipX(this.body.velocity.x < 0);
@@ -173,9 +156,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             this.setRotation(0);
         }
 
-        // ========================
-        // ATAQUE POR TIPO
-        // ========================
         if (this.type === 'light' && playerIsVisible && canAttackTarget) {
             this.tryAttack();
         }
@@ -187,12 +167,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.updateHealthBar();
         this.updateDebugGraphic();
 
-        // Verifica ataque do jogador (feixe) para todos os tipos
         if (this.target.isAttacking) {
             this.checkBeamHit();
         }
 
-        // Checar se está dentro da área de luz da lanterna
         if (this.type !== 'light' && this.target.isLightOn && this.target.fuel > 0) {
             this.checkLanternLight();
         }
@@ -211,9 +189,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         if (!this.target || !this.target.takeDamage) return;
         if (!this.canAttackTarget()) return;
 
-        this.target.takeDamage(20, this.type); // Aumentado de 10 para 20
+        this.target.takeDamage(20, this.type);
 
-        // Feedback visual
         this.setTint(0xff0000);
         this.scene.time.delayedCall(100, () => {
             if (this.active) this.clearTint();
@@ -260,10 +237,9 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             enemyHitX,
             enemyHitY
         );
-        
-        // Se estiver dentro do raio de luz da lanterna
+
         if (dist < player.lightRadius) {
-            this.takeDamage(1); // Dano contínuo menor da luz ambiente
+            this.takeDamage(1);
         }
     }
 
